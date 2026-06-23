@@ -48,23 +48,23 @@ __Legend__:
 | queueMicrotask                           |             | 🎯        |                               |
 | clearSchedule                            |             | 📦        |                               |
 | currentTimeMicros                        |             | 📦        |                               |
-| stringFromCharCodeArray                  |             | 🎯        |                               |
+| stringFromCharCodeArray                  | ✅          | 🎯        |                               |
 | stringFromAsciiBytes                     | ✅          | 🎯        |                               |
 | stringLength                             | ✅          | 🎯        |                               |
-| stringEquals                             |             | 🎯        |                               |
-| stringCompare                            |             | 🎯        |                               |
+| stringEquals                             | ✅          | 🎯        |                               |
+| stringCompare                            | ✅          | 🎯        |                               |
 | stringCodeUnitAt                         | ✅          | 🎯        |                               |
-| stringIndexOfString                      |             | 🎯        |                               |
-| stringLastIndexOfString                  |             | 🎯        |                               |
+| stringIndexOfString                      | ✅          | 🎯        |                               |
+| stringLastIndexOfString                  | ✅          | 🎯        |                               |
 | stringReplaceAllString                   |             | 🎯        |                               |
 | stringReplaceAllRegExp                   |             | 🎯        |                               |
-| stringSubstring                          |             | 🎯        |                               |
-| stringToLowerCase                        |             | 🎯        |                               |
-| stringToUpperCase                        |             | 🎯        |                               |
-| stringConcat                             |             | 🎯        |                               |
-| stringRepeat                             |             | 🎯        |                               |
-| stringReplaceRange                       |             | 🎯        |                               |
-| stringToCodeUnits                        |             | 🎯        |                               |
+| stringSubstring                          | ✅          | 🎯        |                               |
+| stringToLowerCase                        | ✅          | 🎯        |                               |
+| stringToUpperCase                        | ✅          | 🎯        |                               |
+| stringConcat                             | ✅          | 🎯        |                               |
+| stringRepeat                             | ✅          | 🎯        |                               |
+| stringReplaceRange                       | ✅          | 🎯        |                               |
+| stringToCodeUnits                        | ✅          | 🎯        |                               |
 | monotonicClockFrequency                  |             | 📦        |                               |
 | monotonicClockTicks                      |             | 📦        |                               |
 | weakRefCreate                            |             | 🛑        |                               |
@@ -117,8 +117,8 @@ __Legend__:
 | mathAtan                                 | ✅          | 🎯        | Using `libm` in Rust.         |
 | mathExp                                  | ✅          | 🎯        | Using `libm` in Rust.         |
 | mathLog                                  | ✅          | 🎯        | Using `libm` in Rust.         |
-| randomInt                                |             | 📦        |                               |
-| randomIntSecure                          |             | 📦        |                               |
+| randomInt                                |             | 📦        | Use wasi:random/insecure's get-insecure-random-u64   |
+| randomIntSecure                          |             | 📦        | Use wasi:random/random's get-random-u64             |
 | print                                    |             | 📦        | Currently a stub              |
 | jsonEncodeString                         |             | 🎯        | Currently a stub              |
 | debugger                                 |             | 🛑        |                               |

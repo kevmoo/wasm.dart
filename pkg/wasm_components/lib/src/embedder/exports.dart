@@ -8,6 +8,8 @@ import 'dart:_wasm';
 
 import 'constants.dart';
 import 'number_format.dart';
+import 'random.dart';
+import 'regexp.dart';
 import 'stack_trace.dart';
 import 'string.dart';
 import 'string_buffer.dart';
@@ -200,13 +202,18 @@ WasmExternRef f64ToString(WasmF64 value) {
 
 @pragma('wasm:export')
 WasmI32 stringLength(WasmExternRef? string) {
-  return WasmStringImplementation.fromExtern(string).length.toWasmI32();
+  final wasmString = WasmStringImplementation.fromExtern(string);
+  mixEntropy(wasmString.length);
+  return wasmString.length.toWasmI32();
 }
 
 @pragma('wasm:export')
 WasmI32 stringCodeUnitAt(WasmExternRef? string, WasmI32 index) {
   final wasmString = WasmStringImplementation.fromExtern(string);
-  return WasmI32.fromInt(wasmString.codeUnitAtUnchecked(index.toIntUnsigned()));
+  final idx = index.toIntUnsigned();
+  final char = wasmString.codeUnitAtUnchecked(idx);
+  mixEntropy(char ^ idx);
+  return WasmI32.fromInt(char);
 }
 
 @pragma('wasm:export')
@@ -272,6 +279,109 @@ WasmVoid debugger(WasmExternRef? message) {
 
 @pragma('wasm:export', 'print')
 WasmVoid wasiPrint(WasmExternRef? string) {
-  printImpl(.fromExtern(string));
+  printImpl(WasmStringImplementation.fromExtern(string));
   return WasmVoid();
+}
+
+@pragma('wasm:export')
+WasmExternRef? stringReplaceAllString(
+  WasmExternRef? string,
+  WasmExternRef? needle,
+  WasmExternRef? replacement,
+) {
+  return embedderStringReplaceAllString(string, needle, replacement);
+}
+
+@pragma('wasm:export')
+WasmExternRef? stringReplaceAllRegExp(
+  WasmExternRef? string,
+  WasmExternRef? needle,
+  WasmExternRef? replacement,
+) {
+  return embedderStringReplaceAllRegExp(string, needle, replacement);
+}
+
+@pragma('wasm:export')
+WasmExternRef regexpCreateOrFailWithString(
+  WasmExternRef? string,
+  WasmI32 multiLine,
+  WasmI32 caseSensitive,
+  WasmI32 unicode,
+  WasmI32 dotAll,
+) {
+  return embedderRegexpCreateOrFailWithString(
+    string,
+    multiLine,
+    caseSensitive,
+    unicode,
+    dotAll,
+  );
+}
+
+@pragma('wasm:export')
+WasmI32 regexpIsRegexp(WasmExternRef? ref) {
+  return embedderRegexpIsRegexp(ref);
+}
+
+@pragma('wasm:export')
+WasmExternRef regexpEscape(WasmExternRef? string) {
+  return embedderRegexpEscape(string);
+}
+
+@pragma('wasm:export')
+WasmExternRef? regexpMatch(
+  WasmExternRef? regexp,
+  WasmExternRef? string,
+  WasmI32 start,
+  WasmI32 asPrefix,
+) {
+  return embedderRegexpMatch(regexp, string, start, asPrefix);
+}
+
+@pragma('wasm:export')
+WasmI32 regexpMatchGetStart(WasmExternRef? match) {
+  return embedderRegexpMatchGetStart(match);
+}
+
+@pragma('wasm:export')
+WasmI32 regexpMatchGetEnd(WasmExternRef? match) {
+  return embedderRegexpMatchGetEnd(match);
+}
+
+@pragma('wasm:export')
+WasmI32 regexpMatchGetGroupCount(WasmExternRef? match) {
+  return embedderRegexpMatchGetGroupCount(match);
+}
+
+@pragma('wasm:export')
+WasmExternRef? regexpMatchGetGroup(WasmExternRef? match, WasmI32 index) {
+  return embedderRegexpMatchGetGroup(match, index);
+}
+
+@pragma('wasm:export')
+WasmI32 regexpMatchGetNamedGroups(WasmExternRef? match) {
+  return embedderRegexpMatchGetNamedGroups(match);
+}
+
+@pragma('wasm:export')
+WasmExternRef regexpMatchGetGroupName(WasmExternRef? match, WasmI32 index) {
+  return embedderRegexpMatchGetGroupName(match, index);
+}
+
+@pragma('wasm:export')
+WasmExternRef? regexpMatchGetGroupByName(
+  WasmExternRef? match,
+  WasmI32 nameIndex,
+) {
+  return embedderRegexpMatchGetGroupByName(match, nameIndex);
+}
+
+@pragma('wasm:export')
+WasmI64 randomInt() {
+  return embedderRandomInt();
+}
+
+@pragma('wasm:export')
+WasmI64 randomIntSecure() {
+  return embedderRandomIntSecure();
 }
