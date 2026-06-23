@@ -101,6 +101,94 @@ WasmExternRef? baseUri() {
 }
 
 @pragma('wasm:export')
+WasmI32 stringIndexOfString(WasmExternRef? a, WasmExternRef? b, WasmI32 start) {
+  final stringA = WasmStringImplementation.fromExtern(a);
+  final stringB = WasmStringImplementation.fromExtern(b);
+  return WasmI32.fromInt(
+    WasmStringImplementation.indexOfString(
+      stringA,
+      stringB,
+      start.toIntUnsigned(),
+    ),
+  );
+}
+
+@pragma('wasm:export')
+WasmI32 stringLastIndexOfString(
+  WasmExternRef? a,
+  WasmExternRef? b,
+  WasmI32 start,
+) {
+  final stringA = WasmStringImplementation.fromExtern(a);
+  final stringB = WasmStringImplementation.fromExtern(b);
+  return WasmI32.fromInt(
+    WasmStringImplementation.lastIndexOfString(
+      stringA,
+      stringB,
+      start.toIntUnsigned(),
+    ),
+  );
+}
+
+@pragma('wasm:export')
+WasmExternRef? stringRepeat(WasmExternRef? string, WasmI32 times) {
+  final wasmString = WasmStringImplementation.fromExtern(string);
+  return WasmAnyRef.fromObject(
+    WasmStringImplementation.repeat(wasmString, times.toIntUnsigned()),
+  ).externalize();
+}
+
+@pragma('wasm:export')
+WasmVoid stringToCodeUnits(
+  WasmExternRef? string,
+  WasmArray<WasmI16> outArray,
+  WasmI32 startIndex,
+) {
+  final wasmString = WasmStringImplementation.fromExtern(string);
+  WasmStringImplementation.toCodeUnits(
+    wasmString,
+    outArray,
+    startIndex.toIntUnsigned(),
+  );
+  return WasmVoid();
+}
+
+@pragma('wasm:export')
+WasmExternRef? stringToLowerCase(WasmExternRef? string) {
+  final wasmString = WasmStringImplementation.fromExtern(string);
+  return WasmAnyRef.fromObject(
+    WasmStringImplementation.toLowerCase(wasmString),
+  ).externalize();
+}
+
+@pragma('wasm:export')
+WasmExternRef? stringToUpperCase(WasmExternRef? string) {
+  final wasmString = WasmStringImplementation.fromExtern(string);
+  return WasmAnyRef.fromObject(
+    WasmStringImplementation.toUpperCase(wasmString),
+  ).externalize();
+}
+
+@pragma('wasm:export')
+WasmExternRef? stringReplaceRange(
+  WasmExternRef? string,
+  WasmI32 start,
+  WasmI32 end,
+  WasmExternRef? replacement,
+) {
+  final wasmString = WasmStringImplementation.fromExtern(string);
+  final wasmReplacement = WasmStringImplementation.fromExtern(replacement);
+  return WasmAnyRef.fromObject(
+    WasmStringImplementation.replaceRange(
+      wasmString,
+      start.toIntUnsigned(),
+      end.toIntUnsigned(),
+      wasmReplacement,
+    ),
+  ).externalize();
+}
+
+@pragma('wasm:export')
 WasmExternRef i64ToString(WasmI64 value, WasmI32 radix) {
   return intToString(value.toInt(), radix.toIntUnsigned()).externalize();
 }

@@ -56,6 +56,155 @@ sealed class WasmStringImplementation {
       return Utf16String.unsafeWrap(copy);
     }
   }
+
+  static int indexOfString(
+    WasmStringImplementation a,
+    WasmStringImplementation b,
+    int start,
+  ) {
+    final lenA = a.length;
+    final lenB = b.length;
+    if (start < 0) start = 0;
+    if (start > lenA) return -1;
+    if (lenB == 0) return start;
+
+    final limit = lenA - lenB;
+    for (int i = start; i <= limit; i++) {
+      bool match = true;
+      for (int j = 0; j < lenB; j++) {
+        if (a.codeUnitAtUnchecked(i + j) != b.codeUnitAtUnchecked(j)) {
+          match = false;
+          break;
+        }
+      }
+      if (match) return i;
+    }
+    return -1;
+  }
+
+  static int lastIndexOfString(
+    WasmStringImplementation a,
+    WasmStringImplementation b,
+    int start,
+  ) {
+    final lenA = a.length;
+    final lenB = b.length;
+    if (start < 0) return -1;
+    if (start > lenA) start = lenA;
+    if (lenB == 0) return start;
+    if (lenA < lenB) return -1;
+
+    final limit = lenA - lenB;
+    if (start > limit) start = limit;
+
+    for (int i = start; i >= 0; i--) {
+      bool match = true;
+      for (int j = 0; j < lenB; j++) {
+        if (a.codeUnitAtUnchecked(i + j) != b.codeUnitAtUnchecked(j)) {
+          match = false;
+          break;
+        }
+      }
+      if (match) return i;
+    }
+    return -1;
+  }
+
+  static WasmStringImplementation repeat(
+    WasmStringImplementation a,
+    int times,
+  ) {
+    final len = a.length;
+    final totalLen = len * times;
+    if (totalLen == 0) return Latin1String.empty;
+    if (a is Latin1String) {
+      final copy = WasmArray<WasmI8>(totalLen);
+      for (int t = 0; t < times; t++) {
+        copy.copyTyped(t * len, a.codeUnits, 0, len);
+      }
+      return Latin1String.unsafeWrap(copy);
+    } else {
+      final copy = WasmArray<WasmI16>(totalLen);
+      for (int t = 0; t < times; t++) {
+        copy.copyTyped(t * len, (a as Utf16String).codeUnits, 0, len);
+      }
+      return Utf16String.unsafeWrap(copy);
+    }
+  }
+
+  static void toCodeUnits(
+    WasmStringImplementation a,
+    WasmArray<WasmI16> outArray,
+    int startIndex,
+  ) {
+    final len = a.length;
+    for (int i = 0; i < len; i++) {
+      outArray.write(startIndex + i, a.codeUnitAtUnchecked(i));
+    }
+  }
+
+  static int _toLower(int codeUnit) {
+    if (codeUnit >= 65 && codeUnit <= 90) return codeUnit + 32; // A-Z
+    if (codeUnit >= 192 && codeUnit <= 214) return codeUnit + 32; // À-Ö
+    if (codeUnit >= 216 && codeUnit <= 222) return codeUnit + 32; // Ø-Þ
+    return codeUnit;
+  }
+
+  static int _toUpper(int codeUnit) {
+    if (codeUnit >= 97 && codeUnit <= 122) return codeUnit - 32; // a-z
+    if (codeUnit >= 224 && codeUnit <= 246) return codeUnit - 32; // à-ö
+    if (codeUnit >= 248 && codeUnit <= 254) return codeUnit - 32; // ø-þ
+    return codeUnit;
+  }
+
+  static WasmStringImplementation toLowerCase(WasmStringImplementation a) {
+    final len = a.length;
+    if (a is Latin1String) {
+      final copy = WasmArray<WasmI8>(len);
+      for (int i = 0; i < len; i++) {
+        final c = a.codeUnitAtUnchecked(i);
+        copy.write(i, _toLower(c));
+      }
+      return Latin1String.unsafeWrap(copy);
+    } else {
+      final copy = WasmArray<WasmI16>(len);
+      for (int i = 0; i < len; i++) {
+        final c = a.codeUnitAtUnchecked(i);
+        copy.write(i, _toLower(c));
+      }
+      return Utf16String.unsafeWrap(copy);
+    }
+  }
+
+  static WasmStringImplementation toUpperCase(WasmStringImplementation a) {
+    final len = a.length;
+    if (a is Latin1String) {
+      final copy = WasmArray<WasmI8>(len);
+      for (int i = 0; i < len; i++) {
+        final c = a.codeUnitAtUnchecked(i);
+        copy.write(i, _toUpper(c));
+      }
+      return Latin1String.unsafeWrap(copy);
+    } else {
+      final copy = WasmArray<WasmI16>(len);
+      for (int i = 0; i < len; i++) {
+        final c = a.codeUnitAtUnchecked(i);
+        copy.write(i, _toUpper(c));
+      }
+      return Utf16String.unsafeWrap(copy);
+    }
+  }
+
+  static WasmStringImplementation replaceRange(
+    WasmStringImplementation string,
+    int start,
+    int end,
+    WasmStringImplementation replacement,
+  ) {
+    final prefix = substring(string, 0, start);
+    final suffix = substring(string, end, string.length);
+    return concat(concat(prefix, replacement), suffix);
+  }
 }
 
 final class Latin1String extends WasmStringImplementation {
