@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:logging/logging.dart';
+import 'package:package_config/package_config.dart';
 import 'package:path/path.dart' as p;
 
 import 'components/component.dart';
@@ -39,19 +40,38 @@ final class ComponentCompiler {
       final abi = resolved.abi;
 
       logger.fine('Building main application');
-      var result = await (await Process.start(Platform.executable, [
-        'compile',
-        'wasm',
+      final binDir = p.dirname(Platform.resolvedExecutable);
+      final sdkDir = p.dirname(binDir);
+      final dartaotruntime = p.join(binDir, 'dartaotruntime');
+      final snapshot = p.join(
+        binDir,
+        'snapshots',
+        'dart2wasm_product.snapshot',
+      );
+      final librariesSpec = p.join(sdkDir, 'lib', 'libraries.json');
+      final pkgConfig = await findPackageConfigAndUri(
+        options.input.absolute.uri,
+      );
+      final packageConfigPath = pkgConfig?.file.toFilePath();
+
+      final args = [
+        snapshot,
+        '--libraries-spec=$librariesSpec',
+        if (packageConfigPath != null) '--packages=$packageConfigPath',
         '--standalone',
-        '-E',
         '--enable-experimental-wasm-interop',
         '--no-minify',
         '--no-strip-wasm',
         '-O0',
         options.input.path,
-        '--output',
         dart2wasmOut,
-      ], mode: .inheritStdio)).exitCode;
+      ];
+
+      var result = await (await Process.start(
+        dartaotruntime,
+        args,
+        mode: ProcessStartMode.inheritStdio,
+      )).exitCode;
       if (result != 0) {
         throw CompilerFailure('dart2wasm failed: $result');
       }
