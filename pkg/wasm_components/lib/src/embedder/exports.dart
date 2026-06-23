@@ -26,14 +26,88 @@ WasmExternRef stringFromAsciiBytes(
 }
 
 @pragma('wasm:export')
+WasmExternRef stringFromCharCodeArray(
+  WasmArray<WasmI16> charCodes,
+  WasmI32 start,
+  WasmI32 length,
+) {
+  return WasmAnyRef.fromObject(
+    Utf16String.fromCharCodes(charCodes, start, length),
+  ).externalize();
+}
+
+@pragma('wasm:export')
+WasmI32 stringEquals(WasmExternRef? a, WasmExternRef? b) {
+  final stringA = WasmStringImplementation.fromExtern(a);
+  final stringB = WasmStringImplementation.fromExtern(b);
+  if (stringA.length != stringB.length) return WasmI32.fromInt(0);
+  for (int i = 0; i < stringA.length; i++) {
+    if (stringA.codeUnitAtUnchecked(i) != stringB.codeUnitAtUnchecked(i)) {
+      return WasmI32.fromInt(0);
+    }
+  }
+  return WasmI32.fromInt(1);
+}
+
+@pragma('wasm:export')
+WasmI32 stringCompare(WasmExternRef? a, WasmExternRef? b) {
+  final stringA = WasmStringImplementation.fromExtern(a);
+  final stringB = WasmStringImplementation.fromExtern(b);
+  final lenA = stringA.length;
+  final lenB = stringB.length;
+  final minLen = lenA < lenB ? lenA : lenB;
+  for (int i = 0; i < minLen; i++) {
+    final charA = stringA.codeUnitAtUnchecked(i);
+    final charB = stringB.codeUnitAtUnchecked(i);
+    if (charA != charB) {
+      return WasmI32.fromInt(charA < charB ? -1 : 1);
+    }
+  }
+  if (lenA != lenB) {
+    return WasmI32.fromInt(lenA < lenB ? -1 : 1);
+  }
+  return WasmI32.fromInt(0);
+}
+
+@pragma('wasm:export')
+WasmExternRef? stringConcat(WasmExternRef? a, WasmExternRef? b) {
+  final stringA = WasmStringImplementation.fromExtern(a);
+  final stringB = WasmStringImplementation.fromExtern(b);
+  return WasmAnyRef.fromObject(
+    WasmStringImplementation.concat(stringA, stringB),
+  ).externalize();
+}
+
+@pragma('wasm:export')
+WasmExternRef? stringSubstring(WasmExternRef? a, WasmI32 start, WasmI32 end) {
+  final stringA = WasmStringImplementation.fromExtern(a);
+  return WasmAnyRef.fromObject(
+    WasmStringImplementation.substring(
+      stringA,
+      start.toIntUnsigned(),
+      end.toIntUnsigned(),
+    ),
+  ).externalize();
+}
+
+@pragma('wasm:export')
+WasmI32 isWindows() {
+  return WasmI32.fromInt(0);
+}
+
+@pragma('wasm:export')
+WasmExternRef? baseUri() {
+  return null;
+}
+
+@pragma('wasm:export')
 WasmExternRef i64ToString(WasmI64 value, WasmI32 radix) {
   return intToString(value.toInt(), radix.toIntUnsigned()).externalize();
 }
 
 @pragma('wasm:export')
 WasmExternRef f64ToString(WasmF64 value) {
-  // TODO
-  return $0.externalize();
+  throw UnimplementedError('f64ToString is not implemented');
 }
 
 @pragma('wasm:export')
@@ -100,8 +174,7 @@ WasmExternRef stackTraceToString(WasmExternRef? _) {
 
 @pragma('wasm:export')
 WasmExternRef jsonEncodeString(WasmExternRef? line) {
-  // TODO: Actually encode as JSON (not sure what exactly this even does).
-  return line!;
+  throw UnimplementedError('jsonEncodeString is not implemented');
 }
 
 @pragma('wasm:export')

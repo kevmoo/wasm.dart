@@ -15,6 +15,47 @@ sealed class WasmStringImplementation {
   static WasmStringImplementation fromExtern(WasmExternRef? ref) {
     return ref!.internalize().toObject() as WasmStringImplementation;
   }
+
+  static WasmStringImplementation concat(
+    WasmStringImplementation a,
+    WasmStringImplementation b,
+  ) {
+    final lenA = a.length;
+    final lenB = b.length;
+    final totalLen = lenA + lenB;
+    if (a is Latin1String && b is Latin1String) {
+      final copy = WasmArray<WasmI8>(totalLen);
+      copy.copyTyped(0, a.codeUnits, 0, lenA);
+      copy.copyTyped(lenA, b.codeUnits, 0, lenB);
+      return Latin1String.unsafeWrap(copy);
+    } else {
+      final copy = WasmArray<WasmI16>(totalLen);
+      for (int i = 0; i < lenA; i++) {
+        copy.write(i, a.codeUnitAtUnchecked(i));
+      }
+      for (int i = 0; i < lenB; i++) {
+        copy.write(lenA + i, b.codeUnitAtUnchecked(i));
+      }
+      return Utf16String.unsafeWrap(copy);
+    }
+  }
+
+  static WasmStringImplementation substring(
+    WasmStringImplementation a,
+    int start,
+    int end,
+  ) {
+    final len = end - start;
+    if (a is Latin1String) {
+      final copy = WasmArray<WasmI8>(len);
+      copy.copyTyped(0, a.codeUnits, start, len);
+      return Latin1String.unsafeWrap(copy);
+    } else {
+      final copy = WasmArray<WasmI16>(len);
+      copy.copyTyped(0, (a as Utf16String).codeUnits, start, len);
+      return Utf16String.unsafeWrap(copy);
+    }
+  }
 }
 
 final class Latin1String extends WasmStringImplementation {
