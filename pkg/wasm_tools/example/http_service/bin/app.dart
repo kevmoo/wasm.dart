@@ -29,7 +29,7 @@ final class _RequestHandler(final ServiceImports _imports) implements Handler {
 <h1>This website is running Dart!</h1>
 
 <p>
-Okay, that alone wouldn't be to impressive. But it's also running in <em>wasmtime</em>!
+Okay, that alone wouldn't be too impressive. But it's also running in <em>wasmtime</em>!
 </p<>
 
 <p>

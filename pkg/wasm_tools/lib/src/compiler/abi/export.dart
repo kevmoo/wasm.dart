@@ -19,6 +19,7 @@ final class ExportedInterface {
 
     for (final MapEntry(:key, :value) in interface.exportedTypes.entries) {
       if (value is ImportedAbiType) continue;
+
       final typeIndex = linker.mapType(value).index;
       inlineExports.add((key, .componentType, typeIndex));
     }
