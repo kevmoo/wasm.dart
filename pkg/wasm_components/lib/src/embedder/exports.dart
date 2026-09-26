@@ -10,7 +10,6 @@ import '../runtime/async/task.dart';
 import 'clock.dart';
 import 'constants.dart';
 import 'number_format.dart';
-import 'regexp.dart';
 import 'stack_trace.dart';
 import 'string.dart';
 import 'string_buffer.dart';
@@ -312,95 +311,40 @@ WasmVoid wasiPrint(WasmExternRef? string) {
 
 @pragma('wasm:export')
 WasmExternRef? stringReplaceAllString(
-  WasmExternRef? string,
-  WasmExternRef? needle,
-  WasmExternRef? replacement,
+  WasmExternRef? stringRef,
+  WasmExternRef? needleRef,
+  WasmExternRef? replacementRef,
 ) {
-  return embedderStringReplaceAllString(string, needle, replacement);
-}
+  final string = WasmStringImplementation.fromExtern(stringRef);
+  final needle = WasmStringImplementation.fromExtern(needleRef);
+  final replacement = WasmStringImplementation.fromExtern(replacementRef);
 
-@pragma('wasm:export')
-WasmExternRef? stringReplaceAllRegExp(
-  WasmExternRef? string,
-  WasmExternRef? needle,
-  WasmExternRef? replacement,
-) {
-  return embedderStringReplaceAllRegExp(string, needle, replacement);
-}
+  final len = string.length;
+  final nLen = needle.length;
 
-@pragma('wasm:export')
-WasmExternRef regexpCreateOrFailWithString(
-  WasmExternRef? string,
-  WasmI32 multiLine,
-  WasmI32 caseSensitive,
-  WasmI32 unicode,
-  WasmI32 dotAll,
-) {
-  return embedderRegexpCreateOrFailWithString(
-    string,
-    multiLine,
-    caseSensitive,
-    unicode,
-    dotAll,
-  );
-}
+  if (nLen == 0) {
+    var result = replacement;
+    for (var i = 0; i < len; i++) {
+      final char = string.substring(i.toWasmI32(), (i + 1).toWasmI32());
+      result = result.concat(char).concat(replacement);
+    }
+    return WasmAnyRef.fromObject(result).externalize();
+  }
 
-@pragma('wasm:export')
-WasmI32 regexpIsRegexp(WasmExternRef? ref) {
-  return embedderRegexpIsRegexp(ref);
-}
-
-@pragma('wasm:export')
-WasmExternRef regexpEscape(WasmExternRef? string) {
-  return embedderRegexpEscape(string);
-}
-
-@pragma('wasm:export')
-WasmExternRef? regexpMatch(
-  WasmExternRef? regexp,
-  WasmExternRef? string,
-  WasmI32 start,
-  WasmI32 asPrefix,
-) {
-  return embedderRegexpMatch(regexp, string, start, asPrefix);
-}
-
-@pragma('wasm:export')
-WasmI32 regexpMatchGetStart(WasmExternRef? match) {
-  return embedderRegexpMatchGetStart(match);
-}
-
-@pragma('wasm:export')
-WasmI32 regexpMatchGetEnd(WasmExternRef? match) {
-  return embedderRegexpMatchGetEnd(match);
-}
-
-@pragma('wasm:export')
-WasmI32 regexpMatchGetGroupCount(WasmExternRef? match) {
-  return embedderRegexpMatchGetGroupCount(match);
-}
-
-@pragma('wasm:export')
-WasmExternRef? regexpMatchGetGroup(WasmExternRef? match, WasmI32 index) {
-  return embedderRegexpMatchGetGroup(match, index);
-}
-
-@pragma('wasm:export')
-WasmI32 regexpMatchGetNamedGroups(WasmExternRef? match) {
-  return embedderRegexpMatchGetNamedGroups(match);
-}
-
-@pragma('wasm:export')
-WasmExternRef regexpMatchGetGroupName(WasmExternRef? match, WasmI32 index) {
-  return embedderRegexpMatchGetGroupName(match, index);
-}
-
-@pragma('wasm:export')
-WasmExternRef? regexpMatchGetGroupByName(
-  WasmExternRef? match,
-  WasmI32 nameIndex,
-) {
-  return embedderRegexpMatchGetGroupByName(match, nameIndex);
+  var result = Latin1String.empty as WasmStringImplementation;
+  var start = 0;
+  while (true) {
+    final idx = string.indexOfString(needle, start);
+    if (idx == -1) {
+      final rest = string.substring(start.toWasmI32(), len.toWasmI32());
+      result = result.concat(rest);
+      break;
+    }
+    final prefix = string.substring(start.toWasmI32(), idx.toWasmI32());
+    result = result.concat(prefix).concat(replacement);
+    start = idx + nLen;
+  }
+  return WasmAnyRef.fromObject(result).externalize();
 }
 
 @pragma('wasm:export', 'randomInt')

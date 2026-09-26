@@ -57,7 +57,7 @@ __Legend__:
 | stringIndexOfString                      | ✅          | 🎯        |                               |
 | stringLastIndexOfString                  | ✅          | 🎯        |                               |
 | stringReplaceAllString                   | ✅          | 🎯        |                               |
-| stringReplaceAllRegExp                   | ✅          | 🎯        |                               |
+| stringReplaceAllRegExp                   |             | 🎯        |                               |
 | stringSubstring                          | ✅          | 🎯        |                               |
 | stringToLowerCase                        | ✅          | 🎯        |                               |
 | stringToUpperCase                        | ✅          | 🎯        |                               |
@@ -94,17 +94,17 @@ __Legend__:
 | stringBufferClear                        | ✅          | 🎯        |                               |
 | stringBufferLength                       | ✅          | 🎯        |                               |
 | stringBufferToString                     | ✅          | 🎯        |                               |
-| regexpCreateOrFailWithString             | ✅          | 🎯        | Using `regex` crate in Rust.  |
-| regexpIsRegexp                           | ✅          | 🎯        | Using `regex` crate in Rust.  |
-| regexpEscape                             | ✅          | 🎯        |                               |
-| regexpMatch                              | ✅          | 🎯        | Using `regex` crate in Rust.  |
-| regexpMatchGetStart                      | ✅          | 🎯        | Using `regex` crate in Rust.  |
-| regexpMatchGetEnd                        | ✅          | 🎯        | Using `regex` crate in Rust.  |
-| regexpMatchGetGroupCount                 | ✅          | 🎯        | Using `regex` crate in Rust.  |
-| regexpMatchGetGroup                      | ✅          | 🎯        | Using `regex` crate in Rust.  |
-| regexpMatchGetNamedGroups                | ✅          | 🎯        | Using `regex` crate in Rust.  |
-| regexpMatchGetGroupName                  | ✅          | 🎯        | Using `regex` crate in Rust.  |
-| regexpMatchGetGroupByName                | ✅          | 🎯        | Using `regex` crate in Rust.  |
+| regexpCreateOrFailWithString             |             | 🎯        |                               |
+| regexpIsRegexp                           |             | 🎯        |                               |
+| regexpEscape                             |             | 🎯        |                               |
+| regexpMatch                              |             | 🎯        |                               |
+| regexpMatchGetStart                      |             | 🎯        |                               |
+| regexpMatchGetEnd                        |             | 🎯        |                               |
+| regexpMatchGetGroupCount                 |             | 🎯        |                               |
+| regexpMatchGetGroup                      |             | 🎯        |                               |
+| regexpMatchGetNamedGroups                |             | 🎯        |                               |
+| regexpMatchGetGroupName                  |             | 🎯        |                               |
+| regexpMatchGetGroupByName                |             | 🎯        |                               |
 | timeZoneNameForClampedSeconds            |             | 📦        | Unimplemented in wasmtime     |
 | timeZoneOffsetInSecondsForClampedSeconds |             | 📦        | Unimplemented in wasmtime     |
 | mathPow                                  | ✅          | 🎯        | Using `libm` in Rust.         |
