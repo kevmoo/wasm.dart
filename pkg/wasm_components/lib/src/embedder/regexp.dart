@@ -3,6 +3,7 @@ import 'dart:_wasm';
 
 import 'libc.dart';
 import 'string.dart';
+import 'string_buffer.dart';
 import 'utils.dart';
 
 final class WasmRegExp {
@@ -369,45 +370,6 @@ WasmExternRef? embedderRegexpMatchGetGroupByName(
   return WasmAnyRef.fromObject(sub).externalize();
 }
 
-WasmExternRef? embedderStringReplaceAllString(
-  WasmExternRef? stringRef,
-  WasmExternRef? needleRef,
-  WasmExternRef? replacementRef,
-) {
-  final string = WasmStringImplementation.fromExtern(stringRef);
-  final needle = WasmStringImplementation.fromExtern(needleRef);
-  final replacement = WasmStringImplementation.fromExtern(replacementRef);
-
-  final len = string.length;
-  final nLen = needle.length;
-
-  if (nLen == 0) {
-    var result = replacement;
-    for (int i = 0; i < len; i++) {
-      final char = string.substring(i.toWasmI32(), (i + 1).toWasmI32());
-      result = result.concat(char);
-      result = result.concat(replacement);
-    }
-    return WasmAnyRef.fromObject(result).externalize();
-  }
-
-  var result = Latin1String.empty as WasmStringImplementation;
-  int start = 0;
-  while (true) {
-    final idx = string.indexOfString(needle, start);
-    if (idx == -1) {
-      final rest = string.substring(start.toWasmI32(), len.toWasmI32());
-      result = result.concat(rest);
-      break;
-    }
-    final prefix = string.substring(start.toWasmI32(), idx.toWasmI32());
-    result = result.concat(prefix);
-    result = result.concat(replacement);
-    start = idx + nLen;
-  }
-  return WasmAnyRef.fromObject(result).externalize();
-}
-
 WasmExternRef? embedderStringReplaceAllRegExp(
   WasmExternRef? stringRef,
   WasmExternRef? regexpRef,
@@ -417,7 +379,7 @@ WasmExternRef? embedderStringReplaceAllRegExp(
   final replacement = WasmStringImplementation.fromExtern(replacementRef);
 
   final len = string.length;
-  var result = Latin1String.empty as WasmStringImplementation;
+  final buffer = WasmStringBuffer();
 
   int start = 0;
   while (start <= len) {
@@ -428,8 +390,8 @@ WasmExternRef? embedderStringReplaceAllRegExp(
       const WasmI32(0),
     );
     if (matchRef.isNull) {
-      final rest = string.substring(start.toWasmI32(), len.toWasmI32());
-      result = result.concat(rest);
+      if (start == 0) return stringRef;
+      buffer.writeString(string.substring(start.toWasmI32(), len.toWasmI32()));
       break;
     }
 
@@ -437,17 +399,13 @@ WasmExternRef? embedderStringReplaceAllRegExp(
     final matchStart = match.groupStarts[0];
     final matchEnd = match.groupEnds[0];
 
-    final prefix = string.substring(start.toWasmI32(), matchStart.toWasmI32());
-    result = result.concat(prefix);
-    result = result.concat(replacement);
+    buffer
+      ..writeString(string.substring(start.toWasmI32(), matchStart.toWasmI32()))
+      ..writeString(replacement);
 
     if (matchEnd == matchStart) {
       if (matchStart < len) {
-        final nextChar = string.substring(
-          matchStart.toWasmI32(),
-          (matchStart + 1).toWasmI32(),
-        );
-        result = result.concat(nextChar);
+        buffer.writeCharCode(string.codeUnitAtUnchecked(matchStart));
       }
       start = matchStart + 1;
     } else {
@@ -455,5 +413,5 @@ WasmExternRef? embedderStringReplaceAllRegExp(
     }
   }
 
-  return WasmAnyRef.fromObject(result).externalize();
+  return buffer.renderToString().externalize();
 }

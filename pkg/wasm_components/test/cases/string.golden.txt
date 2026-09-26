@@ -21,6 +21,7 @@
 {"type":"bool","value":true}
 {"type":"int","value":0}
 {"type":"string","value":"Hello, Dart!"}
+{"type":"string","value":"👋 Dart"}
 {"type":"string","value":"x-b-x-c"}
 {"type":"string","value":"|a|b|"}
 {"type":"int","value":177}
