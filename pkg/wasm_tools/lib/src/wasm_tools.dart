@@ -12,5 +12,5 @@ Future<void> runCli(Logger logger, List<String> args) async {
         )
         ..addCommand(GenerateWitInteropCommand(logger))
         ..addCommand(CompileCommand(logger));
-  runner.run(args);
+  await runner.run(args);
 }
