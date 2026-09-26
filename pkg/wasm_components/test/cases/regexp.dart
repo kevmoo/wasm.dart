@@ -109,4 +109,11 @@ void _edgeCasesAndCompareTo(BaseResultCollector collector) {
   collector.recordInt(e: 'apple'.compareTo('apple'));
   collector.recordBool(e: 'ab'.compareTo('abc') < 0);
   collector.recordBool(e: 'abc'.compareTo('ab') > 0);
+
+  // Bounded LRU cache eviction (>64 distinct patterns) and re-materialization
+  final regexes = <RegExp>[
+    for (var i = 0; i < 80; i++) RegExp('item_$i=(\\d+)'),
+  ];
+  collector.recordString(e: regexes.first.firstMatch('item_0=100')!.group(1)!);
+  collector.recordString(e: regexes.last.firstMatch('item_79=799')!.group(1)!);
 }

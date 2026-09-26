@@ -31,17 +31,11 @@ external WasmI32 dartRegexpCompile(
   WasmI32 dotAll,
 );
 
-@pragma('wasm:import', 'libc.dart_regexpFree')
-external WasmVoid dartRegexpFree(WasmI32 handle);
-
-@pragma('wasm:import', 'libc.dart_regexpIsError')
-external WasmI32 dartRegexpIsError(WasmI32 handle);
-
 @pragma('wasm:import', 'libc.dart_regexpGetErrorPtr')
-external WasmI32 dartRegexpGetErrorPtr(WasmI32 handle);
+external WasmI32 dartRegexpGetErrorPtr();
 
 @pragma('wasm:import', 'libc.dart_regexpGetErrorLen')
-external WasmI32 dartRegexpGetErrorLen(WasmI32 handle);
+external WasmI32 dartRegexpGetErrorLen();
 
 @pragma('wasm:import', 'libc.dart_regexpGetGroupCount')
 external WasmI32 dartRegexpGetGroupCount(WasmI32 handle);

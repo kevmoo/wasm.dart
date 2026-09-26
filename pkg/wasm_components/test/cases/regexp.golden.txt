@@ -51,4 +51,6 @@
 {"type":"int","value":0}
 {"type":"bool","value":true}
 {"type":"bool","value":true}
+{"type":"string","value":"100"}
+{"type":"string","value":"799"}
 {"type":"end","test":4}

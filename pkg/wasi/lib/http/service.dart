@@ -1,28 +1,36 @@
+/// Define a component adhering to the `wasi:http/service` world.
+library;
+
 import 'dart:async';
 import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:shelf/shelf.dart' as shelf;
-import 'package:wasi/http.dart';
-// ignore: implementation_imports
-import 'package:wasi/src/components/wasi_http_service.dart';
 import 'package:wasm_components/wasm_components.dart';
+
+import '../http.dart';
+import '../src/components/wasi_http_service.dart';
+
+export '../src/components/wasi_http_service.dart'
+    show serviceComponent, ServiceImports;
 
 /// Registers a [shelf.Handler] factory as the `wasi:http/service@0.3.0`
 /// component export.
 ///
-/// The [createHandler] callback is invoked inside `wasi:http/handler#handle`
-/// rather than during the WebAssembly component `start` function (`_start`),
-/// because the Component Model forbids calling host imports (such as
-/// `wasi:random/insecure` when seeding Dart `HashMap` / `Object.hashCode`)
-/// during module instantiation.
-void serveWasiShelf(shelf.Handler Function() createHandler) {
+/// The [createHandler] callback receives the world's [ServiceImports] and is
+/// invoked lazily inside `wasi:http/handler#handle` rather than during the
+/// WebAssembly component `start` function (`_start`), because the Component
+/// Model forbids calling host imports (such as `wasi:random/insecure` when
+/// seeding Dart `HashMap` / `Object.hashCode`) during module instantiation.
+void serveWasiShelf(
+  shelf.Handler Function(ServiceImports imports) createHandler,
+) {
   serviceComponent((imports) => _ShelfWasiHandler(imports, createHandler));
 }
 
 final class _ShelfWasiHandler implements Handler {
   final ServiceImports _imports;
-  final shelf.Handler Function() _createHandler;
+  final shelf.Handler Function(ServiceImports imports) _createHandler;
   shelf.Handler? _handler;
 
   _ShelfWasiHandler(this._imports, this._createHandler);
@@ -34,7 +42,7 @@ final class _ShelfWasiHandler implements Handler {
     final httpTypes = _imports.httpTypes;
     var requestConsumed = false;
     try {
-      final handler = _handler ??= _createHandler();
+      final handler = _handler ??= _createHandler(_imports);
       final reqBorrow = request.borrow();
 
       final method = _mapMethod(

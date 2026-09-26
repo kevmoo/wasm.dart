@@ -6,13 +6,23 @@ import 'string.dart';
 import 'utils.dart';
 
 final class WasmRegExp {
-  final WasmI32 handle;
+  WasmI32 handle;
+  final WasmStringImplementation pattern;
+  final WasmI32 multiLine;
+  final WasmI32 caseSensitive;
+  final WasmI32 unicode;
+  final WasmI32 dotAll;
   final int groupCount;
   final List<WasmStringImplementation> namedGroupNames;
   final List<int> namedGroupCaptureIndices;
 
   WasmRegExp(
     this.handle,
+    this.pattern,
+    this.multiLine,
+    this.caseSensitive,
+    this.unicode,
+    this.dotAll,
     this.groupCount,
     this.namedGroupNames,
     this.namedGroupCaptureIndices,
@@ -43,14 +53,13 @@ final class WasmRegExpMatch {
   }
 }
 
-WasmExternRef embedderRegexpCreateOrFailWithString(
-  WasmExternRef? stringRef,
+WasmI32 _compilePatternInCache(
+  WasmStringImplementation pattern,
   WasmI32 multiLine,
   WasmI32 caseSensitive,
   WasmI32 unicode,
   WasmI32 dotAll,
 ) {
-  final pattern = WasmStringImplementation.fromExtern(stringRef);
   final length = pattern.length;
   final patternPtr = length > 0
       ? mallocAligned(const WasmI32(2), (length * 2).toWasmI32())
@@ -76,9 +85,28 @@ WasmExternRef embedderRegexpCreateOrFailWithString(
     dartFree(patternPtr, (length * 2).toWasmI32(), const WasmI32(2));
   }
 
-  if (dartRegexpIsError(handle).toIntSigned() != 0) {
-    final errPtr = dartRegexpGetErrorPtr(handle);
-    final errLen = dartRegexpGetErrorLen(handle).toIntUnsigned();
+  return handle;
+}
+
+WasmExternRef embedderRegexpCreateOrFailWithString(
+  WasmExternRef? stringRef,
+  WasmI32 multiLine,
+  WasmI32 caseSensitive,
+  WasmI32 unicode,
+  WasmI32 dotAll,
+) {
+  final pattern = WasmStringImplementation.fromExtern(stringRef);
+  final handle = _compilePatternInCache(
+    pattern,
+    multiLine,
+    caseSensitive,
+    unicode,
+    dotAll,
+  );
+
+  if (handle.toIntUnsigned() == 0) {
+    final errPtr = dartRegexpGetErrorPtr();
+    final errLen = dartRegexpGetErrorLen().toIntUnsigned();
 
     final errBytes = WasmArray<WasmI16>(errLen);
     final errAddr = errPtr.toIntUnsigned();
@@ -91,7 +119,6 @@ WasmExternRef embedderRegexpCreateOrFailWithString(
       errLen.toWasmI32(),
     );
 
-    dartRegexpFree(handle);
     return WasmAnyRef.fromObject(errMsg).externalize();
   }
 
@@ -143,6 +170,11 @@ WasmExternRef embedderRegexpCreateOrFailWithString(
 
   final wasmRegExp = WasmRegExp(
     handle,
+    pattern,
+    multiLine,
+    caseSensitive,
+    unicode,
+    dotAll,
     groupCount,
     namedNames,
     namedCaptureIndices,
@@ -221,20 +253,38 @@ WasmExternRef? embedderRegexpMatch(
   final arraySize = numGroups * 2;
   final outPtr = mallocAligned(const WasmI32(4), (arraySize * 4).toWasmI32());
 
-  final matchSuccess = dartRegexpMatch(
+  var matchStatus = dartRegexpMatch(
     regexp.handle,
     stringPtr,
     length.toWasmI32(),
     start,
     asPrefix,
     outPtr,
-  );
+  ).toIntSigned();
+
+  if (matchStatus < 0) {
+    regexp.handle = _compilePatternInCache(
+      regexp.pattern,
+      regexp.multiLine,
+      regexp.caseSensitive,
+      regexp.unicode,
+      regexp.dotAll,
+    );
+    matchStatus = dartRegexpMatch(
+      regexp.handle,
+      stringPtr,
+      length.toWasmI32(),
+      start,
+      asPrefix,
+      outPtr,
+    ).toIntSigned();
+  }
 
   if (length > 0) {
     dartFree(stringPtr, (length * 2).toWasmI32(), const WasmI32(2));
   }
 
-  if (matchSuccess.toIntSigned() == 0) {
+  if (matchStatus <= 0) {
     dartFree(outPtr, (arraySize * 4).toWasmI32(), const WasmI32(4));
     return WasmExternRef.nullRef;
   }
