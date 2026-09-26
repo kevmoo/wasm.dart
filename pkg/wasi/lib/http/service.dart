@@ -13,6 +13,7 @@ import '../src/components/wasi_http_service.dart';
 
 export '../src/components/wasi_http_service.dart'
     show serviceComponent, ServiceImports;
+export 'client.dart' show WasiHttpClient;
 
 /// Registers a [shelf.Handler] factory as the `wasi:http/service@0.3.0`
 /// component export.
@@ -63,11 +64,20 @@ final class _ShelfWasiHandler implements Handler {
 
       final requestHeaders = <String, List<String>>{};
       String? hostHeader;
+      String? fallbackOriginAuthority;
       for (final (name, bytes) in rawHeaderPairs) {
         final value = utf8.decode(bytes, allowMalformed: true);
         requestHeaders.putIfAbsent(name, () => <String>[]).add(value);
-        if (hostHeader == null && name.toLowerCase() == 'host') {
+        final lower = name.toLowerCase();
+        if (hostHeader == null &&
+            (lower == 'host' || lower == 'x-forwarded-host')) {
           hostHeader = value;
+        } else if (fallbackOriginAuthority == null &&
+            (lower == 'origin' || lower == 'referer')) {
+          final parsed = Uri.tryParse(value);
+          if (parsed != null && parsed.hasAuthority) {
+            fallbackOriginAuthority = parsed.authority;
+          }
         }
       }
 
@@ -77,6 +87,9 @@ final class _ShelfWasiHandler implements Handler {
           ? authorityOpt.requireValue()
           : (hostHeader != null && hostHeader.isNotEmpty)
           ? hostHeader
+          : (fallbackOriginAuthority != null &&
+                fallbackOriginAuthority.isNotEmpty)
+          ? fallbackOriginAuthority
           : 'localhost';
 
       final pathWithQueryOpt = httpTypes.methodRequestGetPathWithQuery(

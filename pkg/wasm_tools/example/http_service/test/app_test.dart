@@ -1,14 +1,38 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
+import 'package:http/testing.dart';
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:test/test.dart';
 import 'package:wasi_http_service/app_handler.dart';
 
 void main() {
   late shelf.Handler handler;
+  late http.Client mockClient;
 
   setUp(() {
-    handler = createAppHandler();
+    late shelf.Handler inner;
+    mockClient = MockClient.streaming((request, bodyStream) async {
+      final shelfReq = shelf.Request(
+        request.method,
+        request.url,
+        headers: request.headers,
+        body: bodyStream,
+      );
+      final shelfResp = await inner(shelfReq);
+      return http.StreamedResponse(
+        shelfResp.read(),
+        shelfResp.statusCode,
+        headers: shelfResp.headers,
+        request: request,
+      );
+    });
+    inner = createAppHandler(httpClient: mockClient);
+    handler = inner;
+  });
+
+  tearDown(() {
+    mockClient.close();
   });
 
   test('GET / serves HTML dashboard with x-powered-by header', () async {
@@ -82,6 +106,51 @@ void main() {
     final textBody =
         json.decode(await textResp.readAsString()) as Map<String, Object?>;
     expect(textBody['body'], 'plain text payload');
+  });
+
+  test('GET /client-demo sends outbound POST /echo and GET requests', () async {
+    final postDemoResp = await handler(
+      shelf.Request('GET', Uri.parse('http://localhost:8080/client-demo')),
+    );
+    expect(postDemoResp.statusCode, 200);
+    final postDemoBody =
+        json.decode(await postDemoResp.readAsString()) as Map<String, Object?>;
+    expect(postDemoBody['outboundMethod'], 'POST');
+    expect(
+      postDemoBody['outboundUrl'],
+      'http://localhost:8080/echo?via=wasi-http-client',
+    );
+    expect(postDemoBody['upstreamStatus'], 200);
+    final upstreamJson =
+        postDemoBody['upstreamResponse'] as Map<String, Object?>;
+    expect(upstreamJson['echoedMethod'], 'POST');
+    expect(upstreamJson['echoedQuery'], {'via': 'wasi-http-client'});
+
+    final getDemoResp = await handler(
+      shelf.Request(
+        'GET',
+        Uri.parse(
+          'http://localhost:8080/client-demo?url=http%3A%2F%2Flocalhost%3A8080%2Fhello%2FWasiClient',
+        ),
+      ),
+    );
+    expect(getDemoResp.statusCode, 200);
+    final getDemoBody =
+        json.decode(await getDemoResp.readAsString()) as Map<String, Object?>;
+    expect(getDemoBody['outboundMethod'], 'GET');
+    expect(getDemoBody['upstreamStatus'], 200);
+    expect(
+      getDemoBody['upstreamBodyPreview'],
+      contains('Hello, WasiClient! 👋'),
+    );
+  });
+
+  test('GET /client-demo returns 501 when no httpClient is provided', () async {
+    final noClientHandler = createAppHandler();
+    final response = await noClientHandler(
+      shelf.Request('GET', Uri.parse('http://localhost/client-demo')),
+    );
+    expect(response.statusCode, 501);
   });
 
   test('unknown route returns 404', () async {

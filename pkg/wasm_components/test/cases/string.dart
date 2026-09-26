@@ -9,6 +9,7 @@ void main() {
     _lowerUpper,
     _utf8RoundTrip,
     _stringCompareAndReplace,
+    _lowerOptionalAndListStrings,
   ]);
 }
 
@@ -53,4 +54,13 @@ void _stringCompareAndReplace(BaseResultCollector collector) {
     ..recordString(e: 'a-b-a-c'.replaceAll('a', 'x'))
     ..recordString(e: 'ab'.replaceAll('', '|'))
     ..recordInt(e: 'Hi'.codeUnits.reduce((a, b) => a + b));
+}
+
+void _lowerOptionalAndListStrings(BaseResultCollector collector) {
+  collector
+    ..recordOptionalString(e: null)
+    ..recordOptionalString(e: '')
+    ..recordOptionalString(e: 'hello 👋')
+    ..recordStringList(e: const [])
+    ..recordStringList(e: const ['alpha', '', 'beta 👋', 'gamma']);
 }

@@ -8,6 +8,7 @@ environment:
   sdk: ^3.13.0
 
 dependencies:
+  http: ^1.2.0
   meta: ^1.19.0
   hooks: ^2.0.2
   shelf: ^1.4.0

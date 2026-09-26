@@ -1,14 +1,19 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
 import 'package:shelf/shelf.dart' as shelf;
 import 'package:shelf_router/shelf_router.dart';
 
-shelf.Handler createAppHandler() {
+shelf.Handler createAppHandler({http.Client? httpClient}) {
   final router = Router()
     ..get('/', _handleIndex)
     ..get('/hello/<name>', _handleHello)
     ..get('/api/info', _handleInfo)
-    ..post('/echo', _handleEcho);
+    ..post('/echo', _handleEcho)
+    ..get(
+      '/client-demo',
+      (shelf.Request req) => _handleClientDemo(req, httpClient),
+    );
 
   return const shelf.Pipeline()
       .addMiddleware(_wasiServerHeaderMiddleware)
@@ -52,7 +57,7 @@ shelf.Response _handleInfo(shelf.Request request) {
     const JsonEncoder.withIndent('  ').convert({
       'component': 'wasi:http/service@0.3.0',
       'compiler': 'dart2wasm --standalone',
-      'framework': ['package:shelf', 'package:shelf_router'],
+      'framework': ['package:shelf', 'package:shelf_router', 'package:http'],
       'method': request.method,
       'requestedUri': request.requestedUri.toString(),
       'headers': request.headers,
@@ -85,6 +90,87 @@ Future<shelf.Response> _handleEcho(shelf.Request request) async {
   );
 }
 
+Future<shelf.Response> _handleClientDemo(
+  shelf.Request request,
+  http.Client? httpClient,
+) async {
+  if (httpClient == null) {
+    return shelf.Response(
+      501,
+      body: json.encode({'error': 'No http.Client configured'}),
+      headers: {'content-type': 'application/json; charset=utf-8'},
+    );
+  }
+
+  final targetParam = request.requestedUri.queryParameters['url'];
+  final Uri targetUri;
+  if (targetParam != null && targetParam.isNotEmpty) {
+    targetUri = Uri.parse(targetParam);
+  } else if (request.requestedUri.hasPort) {
+    targetUri = request.requestedUri.replace(
+      path: '/echo',
+      queryParameters: {'via': 'wasi-http-client'},
+    );
+  } else {
+    targetUri = Uri.parse('http://127.0.0.1:8080/echo?via=wasi-http-client');
+  }
+
+  final methodParam = request.requestedUri.queryParameters['method']
+      ?.toUpperCase();
+  final usePost =
+      methodParam == 'POST' ||
+      (methodParam == null && targetUri.path.endsWith('/echo'));
+
+  if (!usePost) {
+    final upstream = await httpClient.get(
+      targetUri,
+      headers: {'user-agent': 'WasiHttpClient/0.3 (dart2wasm)'},
+    );
+    return shelf.Response.ok(
+      const JsonEncoder.withIndent('  ').convert({
+        'client': 'WasiHttpClient (package:http over wasi:http/client@0.3.0)',
+        'outboundMethod': 'GET',
+        'outboundUrl': targetUri.toString(),
+        'upstreamStatus': upstream.statusCode,
+        'upstreamHeaders': upstream.headers,
+        'upstreamBodyPreview': upstream.body.length > 300
+            ? '${upstream.body.substring(0, 300)}...'
+            : upstream.body,
+      }),
+      headers: {'content-type': 'application/json; charset=utf-8'},
+    );
+  }
+
+  final upstream = await httpClient.post(
+    targetUri,
+    headers: {
+      'content-type': 'application/json',
+      'x-wasi-client': 'package:http',
+    },
+    body: json.encode({
+      'message': 'Outbound HTTP request via WasiHttpClient!',
+      'interface': 'wasi:http/client@0.3.0',
+    }),
+  );
+
+  Object? upstreamJson = upstream.body;
+  try {
+    upstreamJson = json.decode(upstream.body);
+  } catch (_) {}
+
+  return shelf.Response.ok(
+    const JsonEncoder.withIndent('  ').convert({
+      'client': 'WasiHttpClient (package:http over wasi:http/client@0.3.0)',
+      'outboundMethod': 'POST',
+      'outboundUrl': targetUri.toString(),
+      'upstreamStatus': upstream.statusCode,
+      'upstreamHeaders': upstream.headers,
+      'upstreamResponse': upstreamJson,
+    }),
+    headers: {'content-type': 'application/json; charset=utf-8'},
+  );
+}
+
 const _indexHtml = r'''
 <!doctype html>
 <html lang="en">
@@ -109,11 +195,12 @@ const _indexHtml = r'''
   <p class="subtitle">Compiled with <code>dart2wasm --standalone</code> + <code>package:wasm_tools</code> to a <code>wasi:http/service@0.3.0</code> Component</p>
 
   <div class="card">
-    <h3>Try Routes Live (<code>package:shelf_router</code>)</h3>
+    <h3>Try Routes Live (<code>package:shelf_router</code> + <code>WasiHttpClient</code>)</h3>
     <div class="row">
       <button onclick="callRoute('GET', '/hello/Dash?lang=dart&wasm=true')">GET /hello/Dash</button>
       <button onclick="callRoute('GET', '/api/info')">GET /api/info</button>
       <button onclick="callRoute('POST', '/echo?mode=json', JSON.stringify({hello: 'from browser', componentModel: 0.3}))">POST /echo (JSON)</button>
+      <button onclick="callRoute('GET', '/client-demo?url=' + encodeURIComponent(new URL('/echo?via=wasi-http-client', location.href).href))">GET /client-demo (wasi:http/client)</button>
       <button onclick="callRoute('GET', '/does-not-exist')">GET /does-not-exist (404)</button>
     </div>
     <pre id="output">HTTP 200 OK

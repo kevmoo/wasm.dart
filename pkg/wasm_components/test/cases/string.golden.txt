@@ -26,3 +26,10 @@
 {"type":"string","value":"|a|b|"}
 {"type":"int","value":177}
 {"type":"end","test":4}
+{"type":"start","test":5}
+{"type":"string","value":"<none>"}
+{"type":"string","value":""}
+{"type":"string","value":"hello 👋"}
+{"type":"string","value":""}
+{"type":"string","value":"alpha||beta 👋|gamma"}
+{"type":"end","test":5}
