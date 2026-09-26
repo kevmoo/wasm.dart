@@ -39,7 +39,7 @@ impl ExportedInstance {
     }
 
     pub fn to_abi_export(&self) -> crate::abi::ExportedInstance {
-        let mut functions = HashMap::new();
+        let mut functions = std::collections::BTreeMap::new();
         for export in &self.functions {
             functions.insert(export.function_name.clone(), export.lifted.clone());
         }
