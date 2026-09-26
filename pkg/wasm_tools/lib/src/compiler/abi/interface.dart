@@ -32,9 +32,13 @@ sealed class AbiType {
 final class SimpleAbiType extends AbiType {
   final types.ValueType type;
 
-  const SimpleAbiType(this.type, {super.owner});
-  const SimpleAbiType.primitive(types.PrimitiveType this.type, {super.owner});
-  const SimpleAbiType.string({super.owner}) : type = const types.StringType();
+  const SimpleAbiType._(this.type, {super.owner});
+  const SimpleAbiType.primitive(types.PrimitiveType this.type);
+  const SimpleAbiType.string() : type = const types.StringType();
+
+  SimpleAbiType withOwner(AbiInterface owner) {
+    return SimpleAbiType._(type, owner: owner);
+  }
 }
 
 final class EnumAbiType extends AbiType {

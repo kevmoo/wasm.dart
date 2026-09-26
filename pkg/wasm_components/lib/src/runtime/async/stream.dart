@@ -125,14 +125,14 @@ final class ReadableStream<T extends List<Object?>> extends Stream<T> {
 @internal
 final class StreamSinkState<T extends List<Object?>> {
   final StreamVtable<T> _vtable;
-  final Task? _task;
+  final Task _task;
   final StreamSubscription<T> _subscription;
   final int _id;
   final int _elementSize;
 
   var _otherEndDropped = false;
+  var _receivedDoneEvent = false;
   var _dropped = false;
-  var _done = false;
 
   _PendingStreamBuffer? _pendingWrite;
 
@@ -163,11 +163,12 @@ final class StreamSinkState<T extends List<Object?>> {
   }
 
   void _onDone() {
-    _done = true;
+    _receivedDoneEvent = true;
     _subscription.cancel();
     if (_pendingWrite == null) {
       drop();
     }
+    // Otherwise, we'll drop once the write completes.
   }
 
   int _startWrite(_PendingStreamBuffer write) {
@@ -223,9 +224,10 @@ final class StreamSinkState<T extends List<Object?>> {
           }
 
           // We've completed the write, so the subscription can be resumed (or
-          // dropped if onDone already fired).
+          // dropped if we have already received the done event and just needed
+          // the write to complete).
           assert(_pendingWrite == null);
-          if (_done) {
+          if (_receivedDoneEvent) {
             drop();
           } else {
             _subscription.resume();
@@ -237,7 +239,7 @@ final class StreamSinkState<T extends List<Object?>> {
           _otherEndDropped = true;
           // The other end has been dropped, this corresponds to a cancelled
           // subscription in Dart.
-          if (_done) {
+          if (_receivedDoneEvent) {
             drop();
           } else {
             _subscription.cancel().whenComplete(drop);
@@ -257,7 +259,7 @@ final class StreamSinkState<T extends List<Object?>> {
     if (!_dropped) {
       _dropped = true;
       _vtable.dropWritable(_id);
-      _task?.writeStreams.remove(_id);
+      _task.writeStreams.remove(_id);
     }
   }
 }

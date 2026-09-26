@@ -102,6 +102,16 @@ final class Task {
       Error.throwWithStackTrace(error, trace);
     }
 
+    if (_subtasks.isEmpty &&
+        pendingFutureWrites.isEmpty &&
+        pendingFutureReads.isEmpty &&
+        readStreams.isEmpty &&
+        writeStreams.isEmpty) {
+      waitable.drop();
+      _activeTasks.remove(_id);
+      return CallbackCode.exit.packResult();
+    }
+
     return CallbackCode.wait.packResult(waitable);
   }
 
