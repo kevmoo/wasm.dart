@@ -1,6 +1,6 @@
 use anyhow::{Result, bail};
 use heck::{AsLowerCamelCase, AsUpperCamelCase, ToLowerCamelCase};
-use std::{collections::HashMap, fmt::Write, mem, rc::Rc, slice};
+use std::{collections::BTreeMap, fmt::Write, mem, rc::Rc, slice};
 use wit_bindgen_core::{
     WorldGenerator,
     abi::{
@@ -39,7 +39,7 @@ impl ExportedInstance {
     }
 
     pub fn to_abi_export(&self) -> crate::abi::ExportedInstance {
-        let mut functions = std::collections::BTreeMap::new();
+        let mut functions = BTreeMap::new();
         for export in &self.functions {
             functions.insert(export.function_name.clone(), export.lifted.clone());
         }
