@@ -1,4 +1,4 @@
-use std::collections::HashMap;
+use std::collections::BTreeMap;
 
 use serde::{Serialize, Serializer};
 use wit_bindgen_core::wit_parser::{InterfaceId, Param, Resolve, Type};
@@ -106,7 +106,7 @@ pub struct LiftedFunction {
 pub struct ExportedInstance {
     #[serde(serialize_with = "serialize_interface")]
     pub implements: InterfaceId,
-    pub functions: HashMap<String, LiftedFunction>,
+    pub functions: BTreeMap<String, LiftedFunction>,
 }
 
 fn serialize_interface<S: Serializer>(id: &InterfaceId, s: S) -> Result<S::Ok, S::Error> {
