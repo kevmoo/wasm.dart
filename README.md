@@ -63,8 +63,8 @@ __Legend__:
 | stringToUpperCase                        | ✅          | 🎯        |                               |
 | stringConcat                             | ✅          | 🎯        |                               |
 | stringRepeat                             | ✅          | 🎯        |                               |
-| stringReplaceRange                       |             | 🎯        |                               |
-| stringToCodeUnits                        |             | 🎯        |                               |
+| stringReplaceRange                       | ✅          | 🎯        |                               |
+| stringToCodeUnits                        | ✅          | 🎯        |                               |
 | monotonicClockFrequency                  | ✅          | 📦        |                               |
 | monotonicClockTicks                      | ✅          | 📦        |                               |
 | weakRefCreate                            |             | 🛑        |                               |
@@ -75,8 +75,8 @@ __Legend__:
 | finalizerCreate                          |             | 🛑        |                               |
 | finalizerAttach                          |             | 🛑        |                               |
 | finalizerDetach                          |             | 🛑        |                               |
-| baseUri                                  |             | 📦        |                               |
-| isWindows                                |             | 📦        |                               |
+| baseUri                                  | ✅          | 📦        | Stub used                     |
+| isWindows                                | ✅          | 📦        | Stub used                     |
 | stackTraceGetCurrent                     | ✅          | 🛑        | Impossible, stub used         |
 | stackTraceToString                       | ✅          | 🛑        | Impossible, stub used         |
 | doubleTryParse                           |             | 🎯        |                               |
