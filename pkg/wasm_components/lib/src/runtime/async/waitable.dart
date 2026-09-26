@@ -4,7 +4,7 @@ import 'dart:_wasm';
 @pragma('wasm:import', 'component.canon.waitable-set.new')
 external WasmI32 _waitableSetNew();
 @pragma('wasm:import', 'component.canon.waitable-set.drop')
-external WasmI32 _waitableSetDrop(WasmI32 set);
+external WasmVoid _waitableSetDrop(WasmI32 set);
 @pragma('wasm:import', 'component.canon.waitable.join')
 external WasmVoid waitableJoin(WasmI32 waitable, WasmI32 set);
 
