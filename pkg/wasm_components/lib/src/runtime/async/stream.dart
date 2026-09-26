@@ -131,6 +131,7 @@ final class StreamSinkState<T extends List<Object?>> {
   final int _elementSize;
 
   var _otherEndDropped = false;
+  var _receivedDoneEvent = false;
   var _dropped = false;
 
   _PendingStreamBuffer? _pendingWrite;
@@ -154,6 +155,7 @@ final class StreamSinkState<T extends List<Object?>> {
       );
     }
 
+    _subscription.pause();
     final start = _vtable.allocateBuffer(data.length);
     _vtable.writeToBuffer(start, data);
     final buffer = _PendingStreamBuffer(start, data.length);
@@ -161,8 +163,12 @@ final class StreamSinkState<T extends List<Object?>> {
   }
 
   void _onDone() {
+    _receivedDoneEvent = true;
     _subscription.cancel();
-    drop();
+    if (_pendingWrite == null) {
+      drop();
+    }
+    // Otherwise, we'll drop once the write completes.
   }
 
   int _startWrite(_PendingStreamBuffer write) {
@@ -210,23 +216,34 @@ final class StreamSinkState<T extends List<Object?>> {
               // Continue partial write.
               code = _vtable.write(
                 _id,
-                pending.startPointer + _elementSize,
+                pending.startPointer + pending.acknowledged * _elementSize,
                 pending.totalLength - pending.acknowledged,
               );
               continue writeLoop;
             }
           }
 
-          // We've completed the write, so the subscription can be resumed.
+          // We've completed the write, so the subscription can be resumed (or
+          // dropped if we have already received the done event and just needed
+          // the write to complete).
           assert(_pendingWrite == null);
-          _subscription.resume();
+          if (_receivedDoneEvent) {
+            drop();
+          } else {
+            _subscription.resume();
+          }
         case CopyResult.dropped:
           _pendingWrite?.advance(elementsTransferred);
           _dropPendingWriteBuffer();
+          _pendingWrite = null;
           _otherEndDropped = true;
           // The other end has been dropped, this corresponds to a cancelled
           // subscription in Dart.
-          _subscription.cancel().whenComplete(drop);
+          if (_receivedDoneEvent) {
+            drop();
+          } else {
+            _subscription.cancel().whenComplete(drop);
+          }
         case CopyResult.cancelled:
           // Cancelled means that we tried to cancel an in-progress write, which
           // is something we don't currently do.
