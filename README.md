@@ -75,8 +75,8 @@ __Legend__:
 | finalizerCreate                          |             | 🛑        |                               |
 | finalizerAttach                          |             | 🛑        |                               |
 | finalizerDetach                          |             | 🛑        |                               |
-| baseUri                                  | ✅          | 📦        | Stub (`null`, throws `UnsupportedError`) |
-| isWindows                                | ✅          | 📦        | Returns `false`               |
+| baseUri                                  | ✅          | 📦        | Stub used                     |
+| isWindows                                | ✅          | 📦        | Stub used                     |
 | stackTraceGetCurrent                     | ✅          | 🛑        | Impossible, stub used         |
 | stackTraceToString                       | ✅          | 🛑        | Impossible, stub used         |
 | doubleTryParse                           | ✅          | 🎯        |                               |

@@ -11,6 +11,12 @@ sealed class WasmStringImplementation {
   int get length;
 
   int codeUnitAtUnchecked(int offset);
+  void writeIntoCharArray(
+    WasmArray<WasmI16> target,
+    int targetStart,
+    int start,
+    int end,
+  );
 
   WasmStringImplementation substring(WasmI32 start, WasmI32 end);
   WasmStringImplementation concat(WasmStringImplementation other) {
@@ -105,13 +111,8 @@ sealed class WasmStringImplementation {
     final bLength = b.length;
     final array = WasmArray<WasmI16>(aLength + bLength);
 
-    for (var i = 0; i < aLength; i++) {
-      array.write(i, a.codeUnitAtUnchecked(i));
-    }
-    for (var i = 0; i < bLength; i++) {
-      array.write(aLength + i, b.codeUnitAtUnchecked(i));
-    }
-
+    a.writeIntoCharArray(array, 0, 0, aLength);
+    b.writeIntoCharArray(array, aLength, 0, bLength);
     return Utf16String.unsafeWrap(array);
   }
 }
@@ -143,6 +144,18 @@ final class Latin1String extends WasmStringImplementation {
 
   @override
   int get length => codeUnits.length;
+
+  @override
+  void writeIntoCharArray(
+    WasmArray<WasmI16> target,
+    int targetStart,
+    int start,
+    int end,
+  ) {
+    for (var i = start; i < end; i++) {
+      target.write(targetStart + i - start, codeUnitAtUnchecked(i));
+    }
+  }
 
   @override
   int codeUnitAtUnchecked(int offset) {
@@ -227,6 +240,16 @@ final class Utf16String extends WasmStringImplementation {
   }
 
   @override
+  void writeIntoCharArray(
+    WasmArray<WasmI16> target,
+    int targetStart,
+    int start,
+    int end,
+  ) {
+    target.copyTyped(targetStart, codeUnits, start, end - start);
+  }
+
+  @override
   WasmStringImplementation substring(WasmI32 start, WasmI32 end) {
     return Utf16String.fromCharCodes(codeUnits, start, end - start);
   }
@@ -237,7 +260,7 @@ final class Utf16String extends WasmStringImplementation {
     final array = WasmArray<WasmI16>(sourceLength * amount);
     var offset = 0;
     for (var copy = 0; copy < amount; copy++) {
-      array.copyTyped(offset, codeUnits, 0, sourceLength);
+      writeIntoCharArray(array, offset, 0, sourceLength);
       offset += sourceLength;
     }
 

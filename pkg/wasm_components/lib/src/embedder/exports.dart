@@ -211,9 +211,46 @@ WasmExternRef? stringReplaceRange(
 ) {
   final wasmString = WasmStringImplementation.fromExtern(string);
   final wasmReplacement = WasmStringImplementation.fromExtern(replacement);
-  final prefix = wasmString.substring(const WasmI32(0), start);
-  final suffix = wasmString.substring(end, wasmString.length.toWasmI32());
-  return prefix.concat(wasmReplacement).concat(suffix).externalize();
+  final dartStart = start.toIntUnsigned();
+  final dartEnd = end.toIntUnsigned();
+
+  if (wasmString is Latin1String && wasmReplacement is Latin1String) {
+    final replacementLength = wasmReplacement.length;
+    final resultingLength =
+        wasmString.length - (dartEnd - dartStart) + replacementLength;
+
+    final resultingChars = WasmArray<WasmI8>(resultingLength);
+    resultingChars
+      ..copyTyped(0, wasmString.codeUnits, 0, dartStart)
+      ..copyTyped(dartStart, wasmReplacement.codeUnits, 0, replacementLength)
+      ..copyTyped(
+        dartStart + replacementLength,
+        wasmString.codeUnits,
+        dartEnd,
+        wasmString.length - dartEnd,
+      );
+    return Latin1String.unsafeWrap(resultingChars).externalize();
+  } else {
+    final replacementLength = wasmReplacement.length;
+    final resultingLength =
+        wasmString.length - (dartEnd - dartStart) + replacementLength;
+
+    final resultingChars = WasmArray<WasmI16>(resultingLength);
+    wasmString.writeIntoCharArray(resultingChars, 0, 0, dartStart);
+    wasmReplacement.writeIntoCharArray(
+      resultingChars,
+      dartStart,
+      0,
+      replacementLength,
+    );
+    wasmString.writeIntoCharArray(
+      resultingChars,
+      dartStart + replacementLength,
+      dartEnd,
+      wasmString.length,
+    );
+    return Utf16String.unsafeWrap(resultingChars).externalize();
+  }
 }
 
 @pragma('wasm:export')
@@ -222,23 +259,21 @@ WasmVoid stringToCodeUnits(
   WasmArray<WasmI16> outArray,
   WasmI32 startIndex,
 ) {
-  final wasmString = WasmStringImplementation.fromExtern(string);
-  final len = wasmString.length;
-  final start = startIndex.toIntUnsigned();
-  for (var i = 0; i < len; i++) {
-    outArray.write(start + i, wasmString.codeUnitAtUnchecked(i));
-  }
+  final impl = WasmStringImplementation.fromExtern(string);
+  impl.writeIntoCharArray(outArray, startIndex.toIntUnsigned(), 0, impl.length);
   return WasmVoid();
 }
 
 @pragma('wasm:export')
 WasmI32 isWindows() {
+  // This is only used for URI<->file path formatting, which is not relevant for
+  // WASI.
   return const WasmI32(0);
 }
 
 @pragma('wasm:export')
 WasmExternRef? baseUri() {
-  return WasmExternRef.nullRef;
+  return stubRootUri.externalize();
 }
 
 @pragma('wasm:export')
@@ -321,30 +356,32 @@ WasmExternRef? stringReplaceAllString(
 
   final len = string.length;
   final nLen = needle.length;
+  final buffer = WasmStringBuffer();
 
   if (nLen == 0) {
-    var result = replacement;
+    buffer.writeString(replacement);
     for (var i = 0; i < len; i++) {
-      final char = string.substring(i.toWasmI32(), (i + 1).toWasmI32());
-      result = result.concat(char).concat(replacement);
+      buffer
+        ..writeCharCode(string.codeUnitAtUnchecked(i))
+        ..writeString(replacement);
     }
-    return WasmAnyRef.fromObject(result).externalize();
+    return buffer.renderToString().externalize();
   }
 
-  var result = Latin1String.empty as WasmStringImplementation;
   var start = 0;
   while (true) {
     final idx = string.indexOfString(needle, start);
     if (idx == -1) {
-      final rest = string.substring(start.toWasmI32(), len.toWasmI32());
-      result = result.concat(rest);
+      if (start == 0) return stringRef;
+      buffer.writeString(string.substring(start.toWasmI32(), len.toWasmI32()));
       break;
     }
-    final prefix = string.substring(start.toWasmI32(), idx.toWasmI32());
-    result = result.concat(prefix).concat(replacement);
+    buffer
+      ..writeString(string.substring(start.toWasmI32(), idx.toWasmI32()))
+      ..writeString(replacement);
     start = idx + nLen;
   }
-  return WasmAnyRef.fromObject(result).externalize();
+  return buffer.renderToString().externalize();
 }
 
 @pragma('wasm:export', 'randomInt')
