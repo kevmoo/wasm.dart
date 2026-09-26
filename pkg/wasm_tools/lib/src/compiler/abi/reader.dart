@@ -153,8 +153,11 @@ void readAbi(ProgramAbi abi, Map<String, Object?> encoded) {
         final resolved = _deserializeType(types, definition);
         final originalOwner = resolved.owner;
         if (originalOwner == null) {
-          types.add(resolved);
-          break;
+          if (owner != null) {
+            types.add((resolved as SimpleAbiType).withOwner(owner));
+          } else {
+            types.add(resolved);
+          }
         } else if (originalOwner == owner) {
           types.add(
             ImportedAbiType(
@@ -164,16 +167,16 @@ void readAbi(ProgramAbi abi, Map<String, Object?> encoded) {
               inSameInterface: resolved,
             ),
           );
-          break;
+        } else {
+          types.add(
+            ImportedAbiType(
+              originalOwner,
+              ArgumentError.checkNotNull(name, 'name'),
+              owner: owner,
+            ),
+          );
         }
 
-        types.add(
-          ImportedAbiType(
-            originalOwner,
-            ArgumentError.checkNotNull(name, 'name'),
-            owner: owner,
-          ),
-        );
       default:
         throw ArgumentError.value(kind, 'kind', 'Unknown type kind');
     }
