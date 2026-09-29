@@ -4,12 +4,18 @@ import 'package:test_runner/test_runner.dart';
 
 void main() {
   defineTests(const [
+    _emptyString,
     _stringLength,
     _stringRepeat,
     _lowerUpper,
     _utf8RoundTrip,
     _stringCompareAndReplace,
   ]);
+}
+
+void _emptyString(BaseResultCollector collector) {
+  // Regression test for https://github.com/simolus3/wasm.dart/pull/9
+  collector.recordString(e: '');
 }
 
 void _stringLength(BaseResultCollector collector) {

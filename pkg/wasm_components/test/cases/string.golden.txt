@@ -1,20 +1,23 @@
 {"type":"start","test":0}
-{"type":"int","value":11}
+{"type":"string","value":""}
 {"type":"end","test":0}
 {"type":"start","test":1}
-{"type":"string","value":"eeeeeeeeee"}
+{"type":"int","value":11}
 {"type":"end","test":1}
 {"type":"start","test":2}
+{"type":"string","value":"eeeeeeeeee"}
+{"type":"end","test":2}
+{"type":"start","test":3}
 {"type":"string","value":"hello world"}
 {"type":"string","value":"HELLO WORLD"}
 {"type":"bool","value":true}
 {"type":"bool","value":true}
-{"type":"end","test":2}
-{"type":"start","test":3}
-{"type":"int","value":17}
-{"type":"string","value":"Hello, Wasm! 👋"}
 {"type":"end","test":3}
 {"type":"start","test":4}
+{"type":"int","value":17}
+{"type":"string","value":"Hello, Wasm! 👋"}
+{"type":"end","test":4}
+{"type":"start","test":5}
 {"type":"bool","value":true}
 {"type":"bool","value":true}
 {"type":"bool","value":true}
@@ -23,4 +26,4 @@
 {"type":"string","value":"Hello, Dart!"}
 {"type":"string","value":"👋 Dart"}
 {"type":"int","value":177}
-{"type":"end","test":4}
+{"type":"end","test":5}

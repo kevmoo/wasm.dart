@@ -119,6 +119,9 @@ jobs:
     - name: Compile integration test components
       working-directory: integration_tests
       run: dart run tool/compile.dart
+    - name: Test wasm_components
+      working-directory: pkg/wasm_components
+      run: dart test
     - name: Test wasm_tools
       working-directory: pkg/wasm_tools
       run: dart test
