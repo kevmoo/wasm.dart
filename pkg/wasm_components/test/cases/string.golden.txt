@@ -27,3 +27,10 @@
 {"type":"string","value":"👋 Dart"}
 {"type":"int","value":177}
 {"type":"end","test":5}
+{"type":"start","test":6}
+{"type":"string","value":"<none>"}
+{"type":"string","value":""}
+{"type":"string","value":"hello 👋"}
+{"type":"string","value":""}
+{"type":"string","value":"alpha||beta 👋|gamma"}
+{"type":"end","test":6}

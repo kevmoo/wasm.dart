@@ -609,6 +609,15 @@ if ({is_err}.toBool()) {{
                     uwriteln!(self.definition, " {};", name);
                 }
 
+                let cleanup_var = if !ok_cleanup.is_empty() || !err_cleanup.is_empty() {
+                    let var = self.temporary_variable();
+                    uwriteln!(self.definition, "final {var} = <void Function()>[];");
+                    uwriteln!(&mut self.cleanup, "for (final f in {var}) {{ f(); }}");
+                    Some(var)
+                } else {
+                    None
+                };
+
                 uwrite!(self.definition, "switch ({value}) {{\n  case ");
                 self.definition.imported_identifier(
                     self.dart,
@@ -619,7 +628,11 @@ if ({is_err}.toBool()) {{
                 for (value, name) in ok_results.iter().zip(&result_names) {
                     uwriteln!(self.definition, "{name} = {value};");
                 }
-                uwrite!(self.definition, "{ok_cleanup}\n  case ");
+                if !ok_cleanup.is_empty() {
+                    let var = cleanup_var.as_ref().unwrap();
+                    uwriteln!(self.definition, "{var}.add(() {{\n{ok_cleanup}}});");
+                }
+                uwrite!(self.definition, "\n  case ");
                 self.definition.imported_identifier(
                     self.dart,
                     KnownDartUri::PkgWasmComponents,
@@ -629,7 +642,11 @@ if ({is_err}.toBool()) {{
                 for (value, name) in err_results.iter().zip(&result_names) {
                     uwriteln!(self.definition, "{name} = {value};");
                 }
-                uwriteln!(self.definition, "{err_cleanup}\n}}");
+                if !err_cleanup.is_empty() {
+                    let var = cleanup_var.as_ref().unwrap();
+                    uwriteln!(self.definition, "{var}.add(() {{\n{err_cleanup}}});");
+                }
+                uwriteln!(self.definition, "\n}}");
 
                 results.extend(result_names);
             }
@@ -659,6 +676,15 @@ if ({is_err}.toBool()) {{
                     uwriteln!(self.definition, " {};", name);
                 }
 
+                let cleanup_var = if !some_cleanup.is_empty() || !none_cleanup.is_empty() {
+                    let var = self.temporary_variable();
+                    uwriteln!(self.definition, "final {var} = <void Function()>[];");
+                    uwriteln!(&mut self.cleanup, "for (final f in {var}) {{ f(); }}");
+                    Some(var)
+                } else {
+                    None
+                };
+
                 let tmp = self.temporary_variable();
                 uwrite!(
                     self.definition,
@@ -667,11 +693,19 @@ if ({is_err}.toBool()) {{
                 for (value, name) in some_results.iter().zip(&result_names) {
                     uwriteln!(self.definition, "{name} = {value};");
                 }
-                uwriteln!(self.definition, "{some_cleanup}}} else {{{none}");
+                if !some_cleanup.is_empty() {
+                    let var = cleanup_var.as_ref().unwrap();
+                    uwriteln!(self.definition, "{var}.add(() {{\n{some_cleanup}}});");
+                }
+                uwriteln!(self.definition, "}} else {{{none}");
                 for (value, name) in none_results.iter().zip(&result_names) {
                     uwriteln!(self.definition, "{name} = {value};");
                 }
-                uwriteln!(self.definition, "{none_cleanup}}}");
+                if !none_cleanup.is_empty() {
+                    let var = cleanup_var.as_ref().unwrap();
+                    uwriteln!(self.definition, "{var}.add(() {{\n{none_cleanup}}});");
+                }
+                uwriteln!(self.definition, "}}");
 
                 results.extend(result_names);
             }
@@ -694,6 +728,15 @@ if ({is_err}.toBool()) {{
                 let variant_blocks = self
                     .blocks
                     .split_off(self.blocks.len() - variant.cases.len());
+
+                let cleanup_var = if variant_blocks.iter().any(|b| !b.cleanup.is_empty()) {
+                    let var = self.temporary_variable();
+                    uwriteln!(self.definition, "final {var} = <void Function()>[];");
+                    uwriteln!(&mut self.cleanup, "for (final f in {var}) {{ f(); }}");
+                    Some(var)
+                } else {
+                    None
+                };
 
                 uwriteln!(self.definition, "switch ({variant_expr}) {{");
 
@@ -719,12 +762,21 @@ if ({is_err}.toBool()) {{
                             AsUpperCamelCase(&case.name)
                         );
                     }
-                    uwrite!(self.definition, "{code}");
+                    if cleanup.is_empty() && operands.is_empty() {
+                        uwriteln!(self.definition, "{code}");
+                    } else {
+                        uwrite!(self.definition, "{code}");
+                    }
 
                     for (value, name) in operands.iter().zip(&result_names) {
                         uwriteln!(self.definition, "{name} = {value};");
                     }
-                    uwriteln!(self.definition, "{cleanup}")
+                    if !cleanup.is_empty() {
+                        let var = cleanup_var.as_ref().unwrap();
+                        uwriteln!(self.definition, "{var}.add(() {{\n{cleanup}}});");
+                    } else if !operands.is_empty() {
+                        uwriteln!(self.definition, "");
+                    }
                 }
 
                 uwriteln!(self.definition, "}}");
@@ -1021,7 +1073,8 @@ if ({is_err}.toBool()) {{
                 for arg in args {
                     uwrite!(self.definition, "{arg},");
                 }
-                uwrite!(self.definition, ");");
+                uwriteln!(self.definition, ");");
+                self.write_cleanup();
             }
 
             Instruction::IterElem { element: _ } => {
@@ -1049,6 +1102,21 @@ if ({is_err}.toBool()) {{
                     cleanup,
                     operands: _,
                 } = self.blocks.pop().unwrap();
+
+                let cleanup_var = if !cleanup.is_empty() {
+                    let var = self.temporary_variable();
+                    uwriteln!(self.definition, "final {var} = <void Function()>[];");
+                    uwriteln!(&mut self.cleanup, "for (final f in {var}) {{ f(); }}");
+                    Some(var)
+                } else {
+                    None
+                };
+
+                let deferred_cleanup = match &cleanup_var {
+                    Some(var) => format!("{var}.add(() {{\n{cleanup}}});"),
+                    None => String::new(),
+                };
+
                 uwriteln!(
                     self.definition,
                     "
@@ -1059,7 +1127,7 @@ for (final element in {list}) {{
   final elementPtr = {base_ptr};
   {body}
   {base_ptr} += const {dart}.WasmI32({size});
-  {cleanup}
+  {deferred_cleanup}
 }}
 "
                 );
