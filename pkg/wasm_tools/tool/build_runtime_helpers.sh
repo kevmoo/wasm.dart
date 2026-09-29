@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 RUSTFLAGS="-Zlocation-detail=none -Zfmt-debug=none -Zunstable-options -Cpanic=immediate-abort" \
   cargo +nightly build --release \
@@ -11,4 +12,5 @@ RUSTFLAGS="-Zlocation-detail=none -Zfmt-debug=none -Zunstable-options -Cpanic=im
     --target wasm32-unknown-unknown \
     -p runtime_helpers
 
-cp ../../target/wasm32-unknown-unknown/release/runtime_helpers.wasm  assets/
+TARGET_DIR=$(cargo metadata --format-version 1 --no-deps | jq '.target_directory' -r)
+cp "$TARGET_DIR/wasm32-unknown-unknown/release/runtime_helpers.wasm" assets/
