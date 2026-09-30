@@ -66,8 +66,17 @@ void _stringCompareAndReplace(BaseResultCollector collector) {
 void _errorSafeToString(BaseResultCollector collector) {
   collector
     ..recordString(e: Error.safeToString(123))
-    ..recordString(e: 'string')
-    ..recordString(e: '"Hello world"');
+    ..recordString(e: Error.safeToString('string'))
+    ..recordString(e: Error.safeToString('"Hello world"'));
+}
+
+void _lowerOptionalAndListStrings(BaseResultCollector collector) {
+  collector
+    ..recordOptionalString(e: null)
+    ..recordOptionalString(e: '')
+    ..recordOptionalString(e: 'hello 👋')
+    ..recordStringList(e: const [])
+    ..recordStringList(e: const ['alpha', '', 'beta 👋', 'gamma']);
 }
 
 void _lowerOptionalAndListStrings(BaseResultCollector collector) {
