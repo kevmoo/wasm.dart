@@ -2,6 +2,8 @@ package wasmdart:tests;
 
 interface result-collector {
   record-string: func(e: string);
+  record-optional-string: func(e: option<string>);
+  record-string-list: func(e: list<string>);
   record-double: func(e: f64);
   record-int: func(e: s64);
   record-bool: func(e: bool);

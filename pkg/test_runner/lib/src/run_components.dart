@@ -1,3 +1,5 @@
+import 'package:wasm_components/wasm_components.dart';
+
 import 'components/wasmdart_tests.dart';
 import 'components/wasmdart_tests_root.dart';
 import 'testcase.dart';
@@ -21,6 +23,16 @@ final class const _ImportedCollector(final ResultCollector collector)
   @override
   void recordString({required String e}) {
     collector.recordString(e: e);
+  }
+
+  @override
+  void recordOptionalString({required String? e}) {
+    collector.recordOptionalString(e: e == null ? Option.none : Option.some(e));
+  }
+
+  @override
+  void recordStringList({required List<String> e}) {
+    collector.recordStringList(e: e);
   }
 
   @override

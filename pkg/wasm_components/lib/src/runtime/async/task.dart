@@ -188,10 +188,10 @@ final class Task {
 
       // We don't have to await the future, completing it will trigger an
       // event loop iteration which then runs microtasks.
-      unawaited(readFutureInternal(FutureVtable.voidVtable, read, this));
+      readFutureInternal(FutureVtable.voidVtable, read, this).ignore();
 
       // Immediately complete the future to wake up the task.
-      unawaited(writable.writeValue(null));
+      writable.writeValue(null).ignore();
     }
   }
 

@@ -4057,6 +4057,8 @@ final class _Imported$23 implements i5.Types {
   @override
   i0.Result<i0.Owned<i5.TypesFields>, i5.TypesHeaderError>
   staticFieldsFromList({required List<(String, List<int>)> entries}) {
+    final tmp7 = <void Function()>[];
+
     final tmp4 = i2.WasmI32.fromInt(16 * entries.length);
     final tmp5 = i0.mallocAligned(const i2.WasmI32(4), tmp4);
     var tmp6 = tmp5;
@@ -4092,54 +4094,59 @@ final class _Imported$23 implements i5.Types {
       i0.memory.storeInt32(elementPtr.toIntUnsigned(), tmp2, offset: 8);
 
       tmp6 += const i2.WasmI32(16);
-      tmp0.free();
-      i0.dartFree(tmp2, tmp1, const i2.WasmI32(1));
+      tmp7.add(() {
+        tmp0.free();
+        i0.dartFree(tmp2, tmp1, const i2.WasmI32(1));
+      });
     }
 
-    var tmp7 = i0.mallocAligned(const i2.WasmI32(4), const i2.WasmI32(20));
-    _import41(tmp5, i2.WasmI32.fromInt(entries.length), tmp7);
-    final tmp8 = i0.memory.loadUint8(tmp7.toIntUnsigned(), offset: 0);
-    final i0.Result<i0.Owned<i5.TypesFields>, i5.TypesHeaderError> tmp17;
-    if (tmp8.toBool()) {
-      final tmp11 = i0.memory.loadUint8(tmp7.toIntUnsigned(), offset: 4);
-      final i5.TypesHeaderError tmp16;
-      switch (tmp11.toIntUnsigned()) {
+    var tmp8 = i0.mallocAligned(const i2.WasmI32(4), const i2.WasmI32(20));
+    _import41(tmp5, i2.WasmI32.fromInt(entries.length), tmp8);
+    final tmp9 = i0.memory.loadUint8(tmp8.toIntUnsigned(), offset: 0);
+    final i0.Result<i0.Owned<i5.TypesFields>, i5.TypesHeaderError> tmp18;
+    if (tmp9.toBool()) {
+      final tmp12 = i0.memory.loadUint8(tmp8.toIntUnsigned(), offset: 4);
+      final i5.TypesHeaderError tmp17;
+      switch (tmp12.toIntUnsigned()) {
         case 0:
-          tmp16 = i5.TypesHeaderErrorInvalidSyntax();
+          tmp17 = i5.TypesHeaderErrorInvalidSyntax();
         case 1:
-          tmp16 = i5.TypesHeaderErrorForbidden();
+          tmp17 = i5.TypesHeaderErrorForbidden();
         case 2:
-          tmp16 = i5.TypesHeaderErrorImmutable();
+          tmp17 = i5.TypesHeaderErrorImmutable();
         case 3:
-          tmp16 = i5.TypesHeaderErrorSizeExceeded();
+          tmp17 = i5.TypesHeaderErrorSizeExceeded();
         case 4:
-          final tmp12 = i0.memory.loadUint8(tmp7.toIntUnsigned(), offset: 8);
-          final i0.Option<String> tmp15;
-          if (tmp12.toBool()) {
-            final tmp13 = i0.memory.loadInt32(tmp7.toIntUnsigned(), offset: 12);
-            final tmp14 = i0.memory.loadInt32(tmp7.toIntUnsigned(), offset: 16);
+          final tmp13 = i0.memory.loadUint8(tmp8.toIntUnsigned(), offset: 8);
+          final i0.Option<String> tmp16;
+          if (tmp13.toBool()) {
+            final tmp14 = i0.memory.loadInt32(tmp8.toIntUnsigned(), offset: 12);
+            final tmp15 = i0.memory.loadInt32(tmp8.toIntUnsigned(), offset: 16);
 
-            tmp15 = .some(i0.AllocatedString.read(tmp13, tmp14));
+            tmp16 = .some(i0.AllocatedString.read(tmp14, tmp15));
           } else {
-            tmp15 = .none;
+            tmp16 = .none;
           }
 
-          tmp16 = i5.TypesHeaderErrorOther(tmp15);
+          tmp17 = i5.TypesHeaderErrorOther(tmp16);
 
         default:
           throw ArgumentError('Invalid discrimant value for variant');
       }
 
-      tmp17 = .error(tmp16);
+      tmp18 = .error(tmp17);
     } else {
-      final tmp9 = i0.memory.loadInt32(tmp7.toIntUnsigned(), offset: 4);
-      final tmp10 = i0.Owned<i5.TypesFields>(tmp9.toIntUnsigned(), _drop$127);
-      tmp17 = .ok(tmp10);
+      final tmp10 = i0.memory.loadInt32(tmp8.toIntUnsigned(), offset: 4);
+      final tmp11 = i0.Owned<i5.TypesFields>(tmp10.toIntUnsigned(), _drop$127);
+      tmp18 = .ok(tmp11);
     }
 
+    for (final f in tmp7) {
+      f();
+    }
     i0.dartFree(tmp5, tmp4, const i2.WasmI32(4));
-    i0.dartFree(tmp7, const i2.WasmI32(20), const i2.WasmI32(4));
-    return tmp17;
+    i0.dartFree(tmp8, const i2.WasmI32(20), const i2.WasmI32(4));
+    return tmp18;
   }
 
   @override
@@ -4202,6 +4209,7 @@ final class _Imported$23 implements i5.Types {
     required List<List<int>> value,
   }) {
     final tmp0 = i0.AllocatedString.allocateUtf16(name);
+    final tmp7 = <void Function()>[];
 
     final tmp4 = i2.WasmI32.fromInt(8 * value.length);
     final tmp5 = i0.mallocAligned(const i2.WasmI32(4), tmp4);
@@ -4231,59 +4239,64 @@ final class _Imported$23 implements i5.Types {
       i0.memory.storeInt32(elementPtr.toIntUnsigned(), tmp2, offset: 0);
 
       tmp6 += const i2.WasmI32(8);
-      i0.dartFree(tmp2, tmp1, const i2.WasmI32(1));
+      tmp7.add(() {
+        i0.dartFree(tmp2, tmp1, const i2.WasmI32(1));
+      });
     }
 
-    var tmp7 = i0.mallocAligned(const i2.WasmI32(4), const i2.WasmI32(20));
+    var tmp8 = i0.mallocAligned(const i2.WasmI32(4), const i2.WasmI32(20));
     _import44(
       i2.WasmI32.fromInt(self.handle),
       tmp0.ptr,
       tmp0.packedLength,
       tmp5,
       i2.WasmI32.fromInt(value.length),
-      tmp7,
+      tmp8,
     );
-    final tmp8 = i0.memory.loadUint8(tmp7.toIntUnsigned(), offset: 0);
-    final i0.Result<void, i5.TypesHeaderError> tmp15;
-    if (tmp8.toBool()) {
-      final tmp9 = i0.memory.loadUint8(tmp7.toIntUnsigned(), offset: 4);
-      final i5.TypesHeaderError tmp14;
-      switch (tmp9.toIntUnsigned()) {
+    final tmp9 = i0.memory.loadUint8(tmp8.toIntUnsigned(), offset: 0);
+    final i0.Result<void, i5.TypesHeaderError> tmp16;
+    if (tmp9.toBool()) {
+      final tmp10 = i0.memory.loadUint8(tmp8.toIntUnsigned(), offset: 4);
+      final i5.TypesHeaderError tmp15;
+      switch (tmp10.toIntUnsigned()) {
         case 0:
-          tmp14 = i5.TypesHeaderErrorInvalidSyntax();
+          tmp15 = i5.TypesHeaderErrorInvalidSyntax();
         case 1:
-          tmp14 = i5.TypesHeaderErrorForbidden();
+          tmp15 = i5.TypesHeaderErrorForbidden();
         case 2:
-          tmp14 = i5.TypesHeaderErrorImmutable();
+          tmp15 = i5.TypesHeaderErrorImmutable();
         case 3:
-          tmp14 = i5.TypesHeaderErrorSizeExceeded();
+          tmp15 = i5.TypesHeaderErrorSizeExceeded();
         case 4:
-          final tmp10 = i0.memory.loadUint8(tmp7.toIntUnsigned(), offset: 8);
-          final i0.Option<String> tmp13;
-          if (tmp10.toBool()) {
-            final tmp11 = i0.memory.loadInt32(tmp7.toIntUnsigned(), offset: 12);
-            final tmp12 = i0.memory.loadInt32(tmp7.toIntUnsigned(), offset: 16);
+          final tmp11 = i0.memory.loadUint8(tmp8.toIntUnsigned(), offset: 8);
+          final i0.Option<String> tmp14;
+          if (tmp11.toBool()) {
+            final tmp12 = i0.memory.loadInt32(tmp8.toIntUnsigned(), offset: 12);
+            final tmp13 = i0.memory.loadInt32(tmp8.toIntUnsigned(), offset: 16);
 
-            tmp13 = .some(i0.AllocatedString.read(tmp11, tmp12));
+            tmp14 = .some(i0.AllocatedString.read(tmp12, tmp13));
           } else {
-            tmp13 = .none;
+            tmp14 = .none;
           }
 
-          tmp14 = i5.TypesHeaderErrorOther(tmp13);
+          tmp15 = i5.TypesHeaderErrorOther(tmp14);
 
         default:
           throw ArgumentError('Invalid discrimant value for variant');
       }
 
-      tmp15 = .error(tmp14);
+      tmp16 = .error(tmp15);
     } else {
-      tmp15 = .ok(null);
+      tmp16 = .ok(null);
     }
 
     tmp0.free();
+    for (final f in tmp7) {
+      f();
+    }
     i0.dartFree(tmp5, tmp4, const i2.WasmI32(4));
-    i0.dartFree(tmp7, const i2.WasmI32(20), const i2.WasmI32(4));
-    return tmp15;
+    i0.dartFree(tmp8, const i2.WasmI32(20), const i2.WasmI32(4));
+    return tmp16;
   }
 
   @override
@@ -4638,6 +4651,7 @@ final class _Imported$23 implements i5.Types {
     i2.WasmI32 tmp1;
     i2.WasmI32 tmp2;
     i2.WasmI32 tmp3;
+    final tmp4 = <void Function()>[];
     switch (method) {
       case i5.TypesMethodGet():
         tmp1 = const i2.WasmI32(0);
@@ -4689,17 +4703,22 @@ final class _Imported$23 implements i5.Types {
         tmp1 = const i2.WasmI32(9);
         tmp2 = tmp0.ptr;
         tmp3 = tmp0.packedLength;
-        tmp0.free();
+        tmp4.add(() {
+          tmp0.free();
+        });
     }
-    final tmp4 = _import53(i2.WasmI32.fromInt(self.handle), tmp1, tmp2, tmp3);
-    final i0.Result<void, void> tmp5;
-    if (tmp4.toBool()) {
-      tmp5 = .error(null);
+    final tmp5 = _import53(i2.WasmI32.fromInt(self.handle), tmp1, tmp2, tmp3);
+    final i0.Result<void, void> tmp6;
+    if (tmp5.toBool()) {
+      tmp6 = .error(null);
     } else {
-      tmp5 = .ok(null);
+      tmp6 = .ok(null);
     }
 
-    return tmp5;
+    for (final f in tmp4) {
+      f();
+    }
+    return tmp6;
   }
 
   @override
@@ -4731,28 +4750,34 @@ final class _Imported$23 implements i5.Types {
     i2.WasmI32 tmp1;
     i2.WasmI32 tmp2;
     i2.WasmI32 tmp3;
-    final tmp4 = pathWithQuery;
-    if (tmp4.hasValue) {
-      final value = tmp4.requireValue();
+    final tmp4 = <void Function()>[];
+    final tmp5 = pathWithQuery;
+    if (tmp5.hasValue) {
+      final value = tmp5.requireValue();
       final tmp0 = i0.AllocatedString.allocateUtf16(value);
       tmp1 = const i2.WasmI32(1);
       tmp2 = tmp0.ptr;
       tmp3 = tmp0.packedLength;
-      tmp0.free();
+      tmp4.add(() {
+        tmp0.free();
+      });
     } else {
       tmp1 = const i2.WasmI32(0);
       tmp2 = const i2.WasmI32(0);
       tmp3 = const i2.WasmI32(0);
     }
-    final tmp5 = _import55(i2.WasmI32.fromInt(self.handle), tmp1, tmp2, tmp3);
-    final i0.Result<void, void> tmp6;
-    if (tmp5.toBool()) {
-      tmp6 = .error(null);
+    final tmp6 = _import55(i2.WasmI32.fromInt(self.handle), tmp1, tmp2, tmp3);
+    final i0.Result<void, void> tmp7;
+    if (tmp6.toBool()) {
+      tmp7 = .error(null);
     } else {
-      tmp6 = .ok(null);
+      tmp7 = .ok(null);
     }
 
-    return tmp6;
+    for (final f in tmp4) {
+      f();
+    }
+    return tmp7;
   }
 
   @override
@@ -4795,16 +4820,18 @@ final class _Imported$23 implements i5.Types {
     required i0.Borrowed<i5.TypesRequest> self,
     required i0.Option<i5.TypesScheme> scheme,
   }) {
-    i2.WasmI32 tmp4;
     i2.WasmI32 tmp5;
     i2.WasmI32 tmp6;
     i2.WasmI32 tmp7;
-    final tmp8 = scheme;
-    if (tmp8.hasValue) {
-      final value = tmp8.requireValue();
+    i2.WasmI32 tmp8;
+    final tmp9 = <void Function()>[];
+    final tmp10 = scheme;
+    if (tmp10.hasValue) {
+      final value = tmp10.requireValue();
       i2.WasmI32 tmp1;
       i2.WasmI32 tmp2;
       i2.WasmI32 tmp3;
+      final tmp4 = <void Function()>[];
       switch (value) {
         case i5.TypesSchemeHttp():
           tmp1 = const i2.WasmI32(0);
@@ -4821,33 +4848,43 @@ final class _Imported$23 implements i5.Types {
           tmp1 = const i2.WasmI32(2);
           tmp2 = tmp0.ptr;
           tmp3 = tmp0.packedLength;
-          tmp0.free();
+          tmp4.add(() {
+            tmp0.free();
+          });
       }
-      tmp4 = const i2.WasmI32(1);
-      tmp5 = tmp1;
-      tmp6 = tmp2;
-      tmp7 = tmp3;
+      tmp5 = const i2.WasmI32(1);
+      tmp6 = tmp1;
+      tmp7 = tmp2;
+      tmp8 = tmp3;
+      tmp9.add(() {
+        for (final f in tmp4) {
+          f();
+        }
+      });
     } else {
-      tmp4 = const i2.WasmI32(0);
       tmp5 = const i2.WasmI32(0);
       tmp6 = const i2.WasmI32(0);
       tmp7 = const i2.WasmI32(0);
+      tmp8 = const i2.WasmI32(0);
     }
-    final tmp9 = _import57(
+    final tmp11 = _import57(
       i2.WasmI32.fromInt(self.handle),
-      tmp4,
       tmp5,
       tmp6,
       tmp7,
+      tmp8,
     );
-    final i0.Result<void, void> tmp10;
-    if (tmp9.toBool()) {
-      tmp10 = .error(null);
+    final i0.Result<void, void> tmp12;
+    if (tmp11.toBool()) {
+      tmp12 = .error(null);
     } else {
-      tmp10 = .ok(null);
+      tmp12 = .ok(null);
     }
 
-    return tmp10;
+    for (final f in tmp9) {
+      f();
+    }
+    return tmp12;
   }
 
   @override
@@ -4879,28 +4916,34 @@ final class _Imported$23 implements i5.Types {
     i2.WasmI32 tmp1;
     i2.WasmI32 tmp2;
     i2.WasmI32 tmp3;
-    final tmp4 = authority;
-    if (tmp4.hasValue) {
-      final value = tmp4.requireValue();
+    final tmp4 = <void Function()>[];
+    final tmp5 = authority;
+    if (tmp5.hasValue) {
+      final value = tmp5.requireValue();
       final tmp0 = i0.AllocatedString.allocateUtf16(value);
       tmp1 = const i2.WasmI32(1);
       tmp2 = tmp0.ptr;
       tmp3 = tmp0.packedLength;
-      tmp0.free();
+      tmp4.add(() {
+        tmp0.free();
+      });
     } else {
       tmp1 = const i2.WasmI32(0);
       tmp2 = const i2.WasmI32(0);
       tmp3 = const i2.WasmI32(0);
     }
-    final tmp5 = _import59(i2.WasmI32.fromInt(self.handle), tmp1, tmp2, tmp3);
-    final i0.Result<void, void> tmp6;
-    if (tmp5.toBool()) {
-      tmp6 = .error(null);
+    final tmp6 = _import59(i2.WasmI32.fromInt(self.handle), tmp1, tmp2, tmp3);
+    final i0.Result<void, void> tmp7;
+    if (tmp6.toBool()) {
+      tmp7 = .error(null);
     } else {
-      tmp6 = .ok(null);
+      tmp7 = .ok(null);
     }
 
-    return tmp6;
+    for (final f in tmp4) {
+      f();
+    }
+    return tmp7;
   }
 
   @override
@@ -5851,520 +5894,517 @@ i2.WasmI32 _component_0(i2.WasmI32 p0) {
     run: () async {
       final tmp0 = i0.Owned<i5.TypesRequest>(p0.toIntUnsigned(), _drop$164);
       final tmp1 = await _unnamedExport24.handle(request: tmp0);
-      i2.WasmI32 tmp97;
-      i2.WasmI32 tmp98;
-      i2.WasmI32 tmp99;
-      i2.WasmI64 tmp100;
-      i2.WasmI32 tmp101;
-      i2.WasmI32 tmp102;
-      i2.WasmI32 tmp103;
-      i2.WasmI32 tmp104;
+      i2.WasmI32 tmp108;
+      i2.WasmI32 tmp109;
+      i2.WasmI32 tmp110;
+      i2.WasmI64 tmp111;
+      i2.WasmI32 tmp112;
+      i2.WasmI32 tmp113;
+      i2.WasmI32 tmp114;
+      i2.WasmI32 tmp115;
+      final tmp116 = <void Function()>[];
       switch (tmp1) {
         case i0.OkResult(:final value):
-          tmp97 = const i2.WasmI32(0);
-          tmp98 = i2.WasmI32.fromInt(value.handle);
-          tmp99 = const i2.WasmI32(0);
-          tmp100 = const i2.WasmI64(0);
-          tmp101 = const i2.WasmI32(0);
-          tmp102 = const i2.WasmI32(0);
-          tmp103 = const i2.WasmI32(0);
-          tmp104 = const i2.WasmI32(0);
+          tmp108 = const i2.WasmI32(0);
+          tmp109 = i2.WasmI32.fromInt(value.handle);
+          tmp110 = const i2.WasmI32(0);
+          tmp111 = const i2.WasmI64(0);
+          tmp112 = const i2.WasmI32(0);
+          tmp113 = const i2.WasmI32(0);
+          tmp114 = const i2.WasmI32(0);
+          tmp115 = const i2.WasmI32(0);
 
         case i0.ErrorResult(:final value):
-          i2.WasmI32 tmp90;
-          i2.WasmI32 tmp91;
-          i2.WasmI64 tmp92;
-          i2.WasmI32 tmp93;
-          i2.WasmI32 tmp94;
-          i2.WasmI32 tmp95;
-          i2.WasmI32 tmp96;
+          i2.WasmI32 tmp100;
+          i2.WasmI32 tmp101;
+          i2.WasmI64 tmp102;
+          i2.WasmI32 tmp103;
+          i2.WasmI32 tmp104;
+          i2.WasmI32 tmp105;
+          i2.WasmI32 tmp106;
+          final tmp107 = <void Function()>[];
           switch (value) {
             case i5.TypesErrorCodeDnsTimeout():
-              tmp90 = const i2.WasmI32(0);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(0);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeDnsError(payload: final value):
               i2.WasmI32 tmp3;
               i2.WasmI32 tmp4;
               i2.WasmI32 tmp5;
-              final tmp6 = value.rcode;
-              if (tmp6.hasValue) {
-                final value = tmp6.requireValue();
+              final tmp6 = <void Function()>[];
+              final tmp7 = value.rcode;
+              if (tmp7.hasValue) {
+                final value = tmp7.requireValue();
                 final tmp2 = i0.AllocatedString.allocateUtf16(value);
                 tmp3 = const i2.WasmI32(1);
                 tmp4 = tmp2.ptr;
                 tmp5 = tmp2.packedLength;
-                tmp2.free();
+                tmp6.add(() {
+                  tmp2.free();
+                });
               } else {
                 tmp3 = const i2.WasmI32(0);
                 tmp4 = const i2.WasmI32(0);
                 tmp5 = const i2.WasmI32(0);
               }
-              i2.WasmI32 tmp7;
               i2.WasmI32 tmp8;
-              final tmp9 = value.infoCode;
-              if (tmp9.hasValue) {
-                final value = tmp9.requireValue();
-                tmp7 = const i2.WasmI32(1);
-                tmp8 = i2.WasmI32.uint16FromInt(value);
+              i2.WasmI32 tmp9;
+              final tmp10 = value.infoCode;
+              if (tmp10.hasValue) {
+                final value = tmp10.requireValue();
+                tmp8 = const i2.WasmI32(1);
+                tmp9 = i2.WasmI32.uint16FromInt(value);
               } else {
-                tmp7 = const i2.WasmI32(0);
                 tmp8 = const i2.WasmI32(0);
+                tmp9 = const i2.WasmI32(0);
               }
-              tmp90 = const i2.WasmI32(1);
-              tmp91 = tmp3;
-              tmp92 = i2.WasmI64.fromInt(tmp4.toIntUnsigned());
-              tmp93 = tmp5;
-              tmp94 = tmp7;
-              tmp95 = tmp8;
-              tmp96 = const i2.WasmI32(0);
-
+              tmp100 = const i2.WasmI32(1);
+              tmp101 = tmp3;
+              tmp102 = i2.WasmI64.fromInt(tmp4.toIntUnsigned());
+              tmp103 = tmp5;
+              tmp104 = tmp8;
+              tmp105 = tmp9;
+              tmp106 = const i2.WasmI32(0);
+              tmp107.add(() {
+                for (final f in tmp6) {
+                  f();
+                }
+              });
             case i5.TypesErrorCodeDestinationNotFound():
-              tmp90 = const i2.WasmI32(2);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(2);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeDestinationUnavailable():
-              tmp90 = const i2.WasmI32(3);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(3);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeDestinationIpProhibited():
-              tmp90 = const i2.WasmI32(4);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(4);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeDestinationIpUnroutable():
-              tmp90 = const i2.WasmI32(5);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(5);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeConnectionRefused():
-              tmp90 = const i2.WasmI32(6);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(6);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeConnectionTerminated():
-              tmp90 = const i2.WasmI32(7);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(7);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeConnectionTimeout():
-              tmp90 = const i2.WasmI32(8);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(8);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeConnectionReadTimeout():
-              tmp90 = const i2.WasmI32(9);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(9);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeConnectionWriteTimeout():
-              tmp90 = const i2.WasmI32(10);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(10);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeConnectionLimitReached():
-              tmp90 = const i2.WasmI32(11);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(11);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeTlsProtocolError():
-              tmp90 = const i2.WasmI32(12);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(12);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeTlsCertificateError():
-              tmp90 = const i2.WasmI32(13);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(13);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeTlsAlertReceived(payload: final value):
-              i2.WasmI32 tmp10;
               i2.WasmI32 tmp11;
-              final tmp12 = value.alertId;
-              if (tmp12.hasValue) {
-                final value = tmp12.requireValue();
-                tmp10 = const i2.WasmI32(1);
-                tmp11 = i2.WasmI32.uint8FromInt(value);
+              i2.WasmI32 tmp12;
+              final tmp13 = value.alertId;
+              if (tmp13.hasValue) {
+                final value = tmp13.requireValue();
+                tmp11 = const i2.WasmI32(1);
+                tmp12 = i2.WasmI32.uint8FromInt(value);
               } else {
-                tmp10 = const i2.WasmI32(0);
                 tmp11 = const i2.WasmI32(0);
+                tmp12 = const i2.WasmI32(0);
               }
-              i2.WasmI32 tmp14;
               i2.WasmI32 tmp15;
               i2.WasmI32 tmp16;
-              final tmp17 = value.alertMessage;
-              if (tmp17.hasValue) {
-                final value = tmp17.requireValue();
-                final tmp13 = i0.AllocatedString.allocateUtf16(value);
-                tmp14 = const i2.WasmI32(1);
-                tmp15 = tmp13.ptr;
-                tmp16 = tmp13.packedLength;
-                tmp13.free();
+              i2.WasmI32 tmp17;
+              final tmp18 = <void Function()>[];
+              final tmp19 = value.alertMessage;
+              if (tmp19.hasValue) {
+                final value = tmp19.requireValue();
+                final tmp14 = i0.AllocatedString.allocateUtf16(value);
+                tmp15 = const i2.WasmI32(1);
+                tmp16 = tmp14.ptr;
+                tmp17 = tmp14.packedLength;
+                tmp18.add(() {
+                  tmp14.free();
+                });
               } else {
-                tmp14 = const i2.WasmI32(0);
                 tmp15 = const i2.WasmI32(0);
                 tmp16 = const i2.WasmI32(0);
+                tmp17 = const i2.WasmI32(0);
               }
-              tmp90 = const i2.WasmI32(14);
-              tmp91 = tmp10;
-              tmp92 = i2.WasmI64.fromInt(tmp11.toIntUnsigned());
-              tmp93 = tmp14;
-              tmp94 = tmp15;
-              tmp95 = tmp16;
-              tmp96 = const i2.WasmI32(0);
-
+              tmp100 = const i2.WasmI32(14);
+              tmp101 = tmp11;
+              tmp102 = i2.WasmI64.fromInt(tmp12.toIntUnsigned());
+              tmp103 = tmp15;
+              tmp104 = tmp16;
+              tmp105 = tmp17;
+              tmp106 = const i2.WasmI32(0);
+              tmp107.add(() {
+                for (final f in tmp18) {
+                  f();
+                }
+              });
             case i5.TypesErrorCodeHttpRequestDenied():
-              tmp90 = const i2.WasmI32(15);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(15);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpRequestLengthRequired():
-              tmp90 = const i2.WasmI32(16);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(16);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpRequestBodySize(payload: final value):
-              i2.WasmI32 tmp18;
-              i2.WasmI64 tmp19;
-              final tmp20 = value;
-              if (tmp20.hasValue) {
-                final value = tmp20.requireValue();
-                tmp18 = const i2.WasmI32(1);
-                tmp19 = i2.WasmI64.fromInt(value);
+              i2.WasmI32 tmp20;
+              i2.WasmI64 tmp21;
+              final tmp22 = value;
+              if (tmp22.hasValue) {
+                final value = tmp22.requireValue();
+                tmp20 = const i2.WasmI32(1);
+                tmp21 = i2.WasmI64.fromInt(value);
               } else {
-                tmp18 = const i2.WasmI32(0);
-                tmp19 = const i2.WasmI64(0);
+                tmp20 = const i2.WasmI32(0);
+                tmp21 = const i2.WasmI64(0);
               }
-              tmp90 = const i2.WasmI32(17);
-              tmp91 = tmp18;
-              tmp92 = tmp19;
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(17);
+              tmp101 = tmp20;
+              tmp102 = tmp21;
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpRequestMethodInvalid():
-              tmp90 = const i2.WasmI32(18);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(18);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpRequestUriInvalid():
-              tmp90 = const i2.WasmI32(19);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(19);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpRequestUriTooLong():
-              tmp90 = const i2.WasmI32(20);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(20);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpRequestHeaderSectionSize(
               payload: final value,
             ):
-              i2.WasmI32 tmp21;
-              i2.WasmI32 tmp22;
-              final tmp23 = value;
-              if (tmp23.hasValue) {
-                final value = tmp23.requireValue();
-                tmp21 = const i2.WasmI32(1);
-                tmp22 = i2.WasmI32.fromInt(value);
+              i2.WasmI32 tmp23;
+              i2.WasmI32 tmp24;
+              final tmp25 = value;
+              if (tmp25.hasValue) {
+                final value = tmp25.requireValue();
+                tmp23 = const i2.WasmI32(1);
+                tmp24 = i2.WasmI32.fromInt(value);
               } else {
-                tmp21 = const i2.WasmI32(0);
-                tmp22 = const i2.WasmI32(0);
+                tmp23 = const i2.WasmI32(0);
+                tmp24 = const i2.WasmI32(0);
               }
-              tmp90 = const i2.WasmI32(21);
-              tmp91 = tmp21;
-              tmp92 = i2.WasmI64.fromInt(tmp22.toIntUnsigned());
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(21);
+              tmp101 = tmp23;
+              tmp102 = i2.WasmI64.fromInt(tmp24.toIntUnsigned());
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpRequestHeaderSize(payload: final value):
-              i2.WasmI32 tmp32;
-              i2.WasmI32 tmp33;
-              i2.WasmI32 tmp34;
               i2.WasmI32 tmp35;
               i2.WasmI32 tmp36;
               i2.WasmI32 tmp37;
-              final tmp38 = value;
-              if (tmp38.hasValue) {
-                final value = tmp38.requireValue();
-                i2.WasmI32 tmp25;
-                i2.WasmI32 tmp26;
+              i2.WasmI32 tmp38;
+              i2.WasmI32 tmp39;
+              i2.WasmI32 tmp40;
+              final tmp41 = <void Function()>[];
+              final tmp42 = value;
+              if (tmp42.hasValue) {
+                final value = tmp42.requireValue();
                 i2.WasmI32 tmp27;
-                final tmp28 = value.fieldName;
-                if (tmp28.hasValue) {
-                  final value = tmp28.requireValue();
-                  final tmp24 = i0.AllocatedString.allocateUtf16(value);
-                  tmp25 = const i2.WasmI32(1);
-                  tmp26 = tmp24.ptr;
-                  tmp27 = tmp24.packedLength;
-                  tmp24.free();
-                } else {
-                  tmp25 = const i2.WasmI32(0);
-                  tmp26 = const i2.WasmI32(0);
-                  tmp27 = const i2.WasmI32(0);
-                }
+                i2.WasmI32 tmp28;
                 i2.WasmI32 tmp29;
-                i2.WasmI32 tmp30;
-                final tmp31 = value.fieldSize;
+                final tmp30 = <void Function()>[];
+                final tmp31 = value.fieldName;
                 if (tmp31.hasValue) {
                   final value = tmp31.requireValue();
-                  tmp29 = const i2.WasmI32(1);
-                  tmp30 = i2.WasmI32.fromInt(value);
+                  final tmp26 = i0.AllocatedString.allocateUtf16(value);
+                  tmp27 = const i2.WasmI32(1);
+                  tmp28 = tmp26.ptr;
+                  tmp29 = tmp26.packedLength;
+                  tmp30.add(() {
+                    tmp26.free();
+                  });
                 } else {
+                  tmp27 = const i2.WasmI32(0);
+                  tmp28 = const i2.WasmI32(0);
                   tmp29 = const i2.WasmI32(0);
-                  tmp30 = const i2.WasmI32(0);
                 }
-                tmp32 = const i2.WasmI32(1);
-                tmp33 = tmp25;
-                tmp34 = tmp26;
-                tmp35 = tmp27;
-                tmp36 = tmp29;
-                tmp37 = tmp30;
+                i2.WasmI32 tmp32;
+                i2.WasmI32 tmp33;
+                final tmp34 = value.fieldSize;
+                if (tmp34.hasValue) {
+                  final value = tmp34.requireValue();
+                  tmp32 = const i2.WasmI32(1);
+                  tmp33 = i2.WasmI32.fromInt(value);
+                } else {
+                  tmp32 = const i2.WasmI32(0);
+                  tmp33 = const i2.WasmI32(0);
+                }
+                tmp35 = const i2.WasmI32(1);
+                tmp36 = tmp27;
+                tmp37 = tmp28;
+                tmp38 = tmp29;
+                tmp39 = tmp32;
+                tmp40 = tmp33;
+                tmp41.add(() {
+                  for (final f in tmp30) {
+                    f();
+                  }
+                });
               } else {
-                tmp32 = const i2.WasmI32(0);
-                tmp33 = const i2.WasmI32(0);
-                tmp34 = const i2.WasmI32(0);
                 tmp35 = const i2.WasmI32(0);
                 tmp36 = const i2.WasmI32(0);
                 tmp37 = const i2.WasmI32(0);
-              }
-              tmp90 = const i2.WasmI32(22);
-              tmp91 = tmp32;
-              tmp92 = i2.WasmI64.fromInt(tmp33.toIntUnsigned());
-              tmp93 = tmp34;
-              tmp94 = tmp35;
-              tmp95 = tmp36;
-              tmp96 = tmp37;
-
-            case i5.TypesErrorCodeHttpRequestTrailerSectionSize(
-              payload: final value,
-            ):
-              i2.WasmI32 tmp39;
-              i2.WasmI32 tmp40;
-              final tmp41 = value;
-              if (tmp41.hasValue) {
-                final value = tmp41.requireValue();
-                tmp39 = const i2.WasmI32(1);
-                tmp40 = i2.WasmI32.fromInt(value);
-              } else {
+                tmp38 = const i2.WasmI32(0);
                 tmp39 = const i2.WasmI32(0);
                 tmp40 = const i2.WasmI32(0);
               }
-              tmp90 = const i2.WasmI32(23);
-              tmp91 = tmp39;
-              tmp92 = i2.WasmI64.fromInt(tmp40.toIntUnsigned());
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
-
-            case i5.TypesErrorCodeHttpRequestTrailerSize(payload: final value):
+              tmp100 = const i2.WasmI32(22);
+              tmp101 = tmp35;
+              tmp102 = i2.WasmI64.fromInt(tmp36.toIntUnsigned());
+              tmp103 = tmp37;
+              tmp104 = tmp38;
+              tmp105 = tmp39;
+              tmp106 = tmp40;
+              tmp107.add(() {
+                for (final f in tmp41) {
+                  f();
+                }
+              });
+            case i5.TypesErrorCodeHttpRequestTrailerSectionSize(
+              payload: final value,
+            ):
               i2.WasmI32 tmp43;
               i2.WasmI32 tmp44;
-              i2.WasmI32 tmp45;
-              final tmp46 = value.fieldName;
-              if (tmp46.hasValue) {
-                final value = tmp46.requireValue();
-                final tmp42 = i0.AllocatedString.allocateUtf16(value);
+              final tmp45 = value;
+              if (tmp45.hasValue) {
+                final value = tmp45.requireValue();
                 tmp43 = const i2.WasmI32(1);
-                tmp44 = tmp42.ptr;
-                tmp45 = tmp42.packedLength;
-                tmp42.free();
+                tmp44 = i2.WasmI32.fromInt(value);
               } else {
                 tmp43 = const i2.WasmI32(0);
                 tmp44 = const i2.WasmI32(0);
-                tmp45 = const i2.WasmI32(0);
               }
+              tmp100 = const i2.WasmI32(23);
+              tmp101 = tmp43;
+              tmp102 = i2.WasmI64.fromInt(tmp44.toIntUnsigned());
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
+
+            case i5.TypesErrorCodeHttpRequestTrailerSize(payload: final value):
               i2.WasmI32 tmp47;
               i2.WasmI32 tmp48;
-              final tmp49 = value.fieldSize;
-              if (tmp49.hasValue) {
-                final value = tmp49.requireValue();
+              i2.WasmI32 tmp49;
+              final tmp50 = <void Function()>[];
+              final tmp51 = value.fieldName;
+              if (tmp51.hasValue) {
+                final value = tmp51.requireValue();
+                final tmp46 = i0.AllocatedString.allocateUtf16(value);
                 tmp47 = const i2.WasmI32(1);
-                tmp48 = i2.WasmI32.fromInt(value);
+                tmp48 = tmp46.ptr;
+                tmp49 = tmp46.packedLength;
+                tmp50.add(() {
+                  tmp46.free();
+                });
               } else {
                 tmp47 = const i2.WasmI32(0);
                 tmp48 = const i2.WasmI32(0);
+                tmp49 = const i2.WasmI32(0);
               }
-              tmp90 = const i2.WasmI32(24);
-              tmp91 = tmp43;
-              tmp92 = i2.WasmI64.fromInt(tmp44.toIntUnsigned());
-              tmp93 = tmp45;
-              tmp94 = tmp47;
-              tmp95 = tmp48;
-              tmp96 = const i2.WasmI32(0);
-
+              i2.WasmI32 tmp52;
+              i2.WasmI32 tmp53;
+              final tmp54 = value.fieldSize;
+              if (tmp54.hasValue) {
+                final value = tmp54.requireValue();
+                tmp52 = const i2.WasmI32(1);
+                tmp53 = i2.WasmI32.fromInt(value);
+              } else {
+                tmp52 = const i2.WasmI32(0);
+                tmp53 = const i2.WasmI32(0);
+              }
+              tmp100 = const i2.WasmI32(24);
+              tmp101 = tmp47;
+              tmp102 = i2.WasmI64.fromInt(tmp48.toIntUnsigned());
+              tmp103 = tmp49;
+              tmp104 = tmp52;
+              tmp105 = tmp53;
+              tmp106 = const i2.WasmI32(0);
+              tmp107.add(() {
+                for (final f in tmp50) {
+                  f();
+                }
+              });
             case i5.TypesErrorCodeHttpResponseIncomplete():
-              tmp90 = const i2.WasmI32(25);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(25);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpResponseHeaderSectionSize(
               payload: final value,
             ):
-              i2.WasmI32 tmp50;
-              i2.WasmI32 tmp51;
-              final tmp52 = value;
-              if (tmp52.hasValue) {
-                final value = tmp52.requireValue();
-                tmp50 = const i2.WasmI32(1);
-                tmp51 = i2.WasmI32.fromInt(value);
-              } else {
-                tmp50 = const i2.WasmI32(0);
-                tmp51 = const i2.WasmI32(0);
-              }
-              tmp90 = const i2.WasmI32(26);
-              tmp91 = tmp50;
-              tmp92 = i2.WasmI64.fromInt(tmp51.toIntUnsigned());
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
-
-            case i5.TypesErrorCodeHttpResponseHeaderSize(payload: final value):
-              i2.WasmI32 tmp54;
               i2.WasmI32 tmp55;
               i2.WasmI32 tmp56;
-              final tmp57 = value.fieldName;
+              final tmp57 = value;
               if (tmp57.hasValue) {
                 final value = tmp57.requireValue();
-                final tmp53 = i0.AllocatedString.allocateUtf16(value);
-                tmp54 = const i2.WasmI32(1);
-                tmp55 = tmp53.ptr;
-                tmp56 = tmp53.packedLength;
-                tmp53.free();
+                tmp55 = const i2.WasmI32(1);
+                tmp56 = i2.WasmI32.fromInt(value);
               } else {
-                tmp54 = const i2.WasmI32(0);
                 tmp55 = const i2.WasmI32(0);
                 tmp56 = const i2.WasmI32(0);
               }
-              i2.WasmI32 tmp58;
-              i2.WasmI32 tmp59;
-              final tmp60 = value.fieldSize;
-              if (tmp60.hasValue) {
-                final value = tmp60.requireValue();
-                tmp58 = const i2.WasmI32(1);
-                tmp59 = i2.WasmI32.fromInt(value);
-              } else {
-                tmp58 = const i2.WasmI32(0);
-                tmp59 = const i2.WasmI32(0);
-              }
-              tmp90 = const i2.WasmI32(27);
-              tmp91 = tmp54;
-              tmp92 = i2.WasmI64.fromInt(tmp55.toIntUnsigned());
-              tmp93 = tmp56;
-              tmp94 = tmp58;
-              tmp95 = tmp59;
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(26);
+              tmp101 = tmp55;
+              tmp102 = i2.WasmI64.fromInt(tmp56.toIntUnsigned());
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
-            case i5.TypesErrorCodeHttpResponseBodySize(payload: final value):
+            case i5.TypesErrorCodeHttpResponseHeaderSize(payload: final value):
+              i2.WasmI32 tmp59;
+              i2.WasmI32 tmp60;
               i2.WasmI32 tmp61;
-              i2.WasmI64 tmp62;
-              final tmp63 = value;
+              final tmp62 = <void Function()>[];
+              final tmp63 = value.fieldName;
               if (tmp63.hasValue) {
                 final value = tmp63.requireValue();
-                tmp61 = const i2.WasmI32(1);
-                tmp62 = i2.WasmI64.fromInt(value);
+                final tmp58 = i0.AllocatedString.allocateUtf16(value);
+                tmp59 = const i2.WasmI32(1);
+                tmp60 = tmp58.ptr;
+                tmp61 = tmp58.packedLength;
+                tmp62.add(() {
+                  tmp58.free();
+                });
               } else {
+                tmp59 = const i2.WasmI32(0);
+                tmp60 = const i2.WasmI32(0);
                 tmp61 = const i2.WasmI32(0);
-                tmp62 = const i2.WasmI64(0);
               }
-              tmp90 = const i2.WasmI32(28);
-              tmp91 = tmp61;
-              tmp92 = tmp62;
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
-
-            case i5.TypesErrorCodeHttpResponseTrailerSectionSize(
-              payload: final value,
-            ):
               i2.WasmI32 tmp64;
               i2.WasmI32 tmp65;
-              final tmp66 = value;
+              final tmp66 = value.fieldSize;
               if (tmp66.hasValue) {
                 final value = tmp66.requireValue();
                 tmp64 = const i2.WasmI32(1);
@@ -6373,194 +6413,277 @@ i2.WasmI32 _component_0(i2.WasmI32 p0) {
                 tmp64 = const i2.WasmI32(0);
                 tmp65 = const i2.WasmI32(0);
               }
-              tmp90 = const i2.WasmI32(29);
-              tmp91 = tmp64;
-              tmp92 = i2.WasmI64.fromInt(tmp65.toIntUnsigned());
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(27);
+              tmp101 = tmp59;
+              tmp102 = i2.WasmI64.fromInt(tmp60.toIntUnsigned());
+              tmp103 = tmp61;
+              tmp104 = tmp64;
+              tmp105 = tmp65;
+              tmp106 = const i2.WasmI32(0);
+              tmp107.add(() {
+                for (final f in tmp62) {
+                  f();
+                }
+              });
+            case i5.TypesErrorCodeHttpResponseBodySize(payload: final value):
+              i2.WasmI32 tmp67;
+              i2.WasmI64 tmp68;
+              final tmp69 = value;
+              if (tmp69.hasValue) {
+                final value = tmp69.requireValue();
+                tmp67 = const i2.WasmI32(1);
+                tmp68 = i2.WasmI64.fromInt(value);
+              } else {
+                tmp67 = const i2.WasmI32(0);
+                tmp68 = const i2.WasmI64(0);
+              }
+              tmp100 = const i2.WasmI32(28);
+              tmp101 = tmp67;
+              tmp102 = tmp68;
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
+
+            case i5.TypesErrorCodeHttpResponseTrailerSectionSize(
+              payload: final value,
+            ):
+              i2.WasmI32 tmp70;
+              i2.WasmI32 tmp71;
+              final tmp72 = value;
+              if (tmp72.hasValue) {
+                final value = tmp72.requireValue();
+                tmp70 = const i2.WasmI32(1);
+                tmp71 = i2.WasmI32.fromInt(value);
+              } else {
+                tmp70 = const i2.WasmI32(0);
+                tmp71 = const i2.WasmI32(0);
+              }
+              tmp100 = const i2.WasmI32(29);
+              tmp101 = tmp70;
+              tmp102 = i2.WasmI64.fromInt(tmp71.toIntUnsigned());
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpResponseTrailerSize(payload: final value):
-              i2.WasmI32 tmp68;
-              i2.WasmI32 tmp69;
-              i2.WasmI32 tmp70;
-              final tmp71 = value.fieldName;
-              if (tmp71.hasValue) {
-                final value = tmp71.requireValue();
-                final tmp67 = i0.AllocatedString.allocateUtf16(value);
-                tmp68 = const i2.WasmI32(1);
-                tmp69 = tmp67.ptr;
-                tmp70 = tmp67.packedLength;
-                tmp67.free();
+              i2.WasmI32 tmp74;
+              i2.WasmI32 tmp75;
+              i2.WasmI32 tmp76;
+              final tmp77 = <void Function()>[];
+              final tmp78 = value.fieldName;
+              if (tmp78.hasValue) {
+                final value = tmp78.requireValue();
+                final tmp73 = i0.AllocatedString.allocateUtf16(value);
+                tmp74 = const i2.WasmI32(1);
+                tmp75 = tmp73.ptr;
+                tmp76 = tmp73.packedLength;
+                tmp77.add(() {
+                  tmp73.free();
+                });
               } else {
-                tmp68 = const i2.WasmI32(0);
-                tmp69 = const i2.WasmI32(0);
-                tmp70 = const i2.WasmI32(0);
+                tmp74 = const i2.WasmI32(0);
+                tmp75 = const i2.WasmI32(0);
+                tmp76 = const i2.WasmI32(0);
               }
-              i2.WasmI32 tmp72;
-              i2.WasmI32 tmp73;
-              final tmp74 = value.fieldSize;
-              if (tmp74.hasValue) {
-                final value = tmp74.requireValue();
-                tmp72 = const i2.WasmI32(1);
-                tmp73 = i2.WasmI32.fromInt(value);
+              i2.WasmI32 tmp79;
+              i2.WasmI32 tmp80;
+              final tmp81 = value.fieldSize;
+              if (tmp81.hasValue) {
+                final value = tmp81.requireValue();
+                tmp79 = const i2.WasmI32(1);
+                tmp80 = i2.WasmI32.fromInt(value);
               } else {
-                tmp72 = const i2.WasmI32(0);
-                tmp73 = const i2.WasmI32(0);
+                tmp79 = const i2.WasmI32(0);
+                tmp80 = const i2.WasmI32(0);
               }
-              tmp90 = const i2.WasmI32(30);
-              tmp91 = tmp68;
-              tmp92 = i2.WasmI64.fromInt(tmp69.toIntUnsigned());
-              tmp93 = tmp70;
-              tmp94 = tmp72;
-              tmp95 = tmp73;
-              tmp96 = const i2.WasmI32(0);
-
+              tmp100 = const i2.WasmI32(30);
+              tmp101 = tmp74;
+              tmp102 = i2.WasmI64.fromInt(tmp75.toIntUnsigned());
+              tmp103 = tmp76;
+              tmp104 = tmp79;
+              tmp105 = tmp80;
+              tmp106 = const i2.WasmI32(0);
+              tmp107.add(() {
+                for (final f in tmp77) {
+                  f();
+                }
+              });
             case i5.TypesErrorCodeHttpResponseTransferCoding(
               payload: final value,
             ):
-              i2.WasmI32 tmp76;
-              i2.WasmI32 tmp77;
-              i2.WasmI32 tmp78;
-              final tmp79 = value;
-              if (tmp79.hasValue) {
-                final value = tmp79.requireValue();
-                final tmp75 = i0.AllocatedString.allocateUtf16(value);
-                tmp76 = const i2.WasmI32(1);
-                tmp77 = tmp75.ptr;
-                tmp78 = tmp75.packedLength;
-                tmp75.free();
+              i2.WasmI32 tmp83;
+              i2.WasmI32 tmp84;
+              i2.WasmI32 tmp85;
+              final tmp86 = <void Function()>[];
+              final tmp87 = value;
+              if (tmp87.hasValue) {
+                final value = tmp87.requireValue();
+                final tmp82 = i0.AllocatedString.allocateUtf16(value);
+                tmp83 = const i2.WasmI32(1);
+                tmp84 = tmp82.ptr;
+                tmp85 = tmp82.packedLength;
+                tmp86.add(() {
+                  tmp82.free();
+                });
               } else {
-                tmp76 = const i2.WasmI32(0);
-                tmp77 = const i2.WasmI32(0);
-                tmp78 = const i2.WasmI32(0);
+                tmp83 = const i2.WasmI32(0);
+                tmp84 = const i2.WasmI32(0);
+                tmp85 = const i2.WasmI32(0);
               }
-              tmp90 = const i2.WasmI32(31);
-              tmp91 = tmp76;
-              tmp92 = i2.WasmI64.fromInt(tmp77.toIntUnsigned());
-              tmp93 = tmp78;
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
-
+              tmp100 = const i2.WasmI32(31);
+              tmp101 = tmp83;
+              tmp102 = i2.WasmI64.fromInt(tmp84.toIntUnsigned());
+              tmp103 = tmp85;
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
+              tmp107.add(() {
+                for (final f in tmp86) {
+                  f();
+                }
+              });
             case i5.TypesErrorCodeHttpResponseContentCoding(
               payload: final value,
             ):
-              i2.WasmI32 tmp81;
-              i2.WasmI32 tmp82;
-              i2.WasmI32 tmp83;
-              final tmp84 = value;
-              if (tmp84.hasValue) {
-                final value = tmp84.requireValue();
-                final tmp80 = i0.AllocatedString.allocateUtf16(value);
-                tmp81 = const i2.WasmI32(1);
-                tmp82 = tmp80.ptr;
-                tmp83 = tmp80.packedLength;
-                tmp80.free();
+              i2.WasmI32 tmp89;
+              i2.WasmI32 tmp90;
+              i2.WasmI32 tmp91;
+              final tmp92 = <void Function()>[];
+              final tmp93 = value;
+              if (tmp93.hasValue) {
+                final value = tmp93.requireValue();
+                final tmp88 = i0.AllocatedString.allocateUtf16(value);
+                tmp89 = const i2.WasmI32(1);
+                tmp90 = tmp88.ptr;
+                tmp91 = tmp88.packedLength;
+                tmp92.add(() {
+                  tmp88.free();
+                });
               } else {
-                tmp81 = const i2.WasmI32(0);
-                tmp82 = const i2.WasmI32(0);
-                tmp83 = const i2.WasmI32(0);
+                tmp89 = const i2.WasmI32(0);
+                tmp90 = const i2.WasmI32(0);
+                tmp91 = const i2.WasmI32(0);
               }
-              tmp90 = const i2.WasmI32(32);
-              tmp91 = tmp81;
-              tmp92 = i2.WasmI64.fromInt(tmp82.toIntUnsigned());
-              tmp93 = tmp83;
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
-
+              tmp100 = const i2.WasmI32(32);
+              tmp101 = tmp89;
+              tmp102 = i2.WasmI64.fromInt(tmp90.toIntUnsigned());
+              tmp103 = tmp91;
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
+              tmp107.add(() {
+                for (final f in tmp92) {
+                  f();
+                }
+              });
             case i5.TypesErrorCodeHttpResponseTimeout():
-              tmp90 = const i2.WasmI32(33);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(33);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpUpgradeFailed():
-              tmp90 = const i2.WasmI32(34);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(34);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeHttpProtocolError():
-              tmp90 = const i2.WasmI32(35);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(35);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeLoopDetected():
-              tmp90 = const i2.WasmI32(36);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(36);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeConfigurationError():
-              tmp90 = const i2.WasmI32(37);
-              tmp91 = const i2.WasmI32(0);
-              tmp92 = const i2.WasmI64(0);
-              tmp93 = const i2.WasmI32(0);
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(37);
+              tmp101 = const i2.WasmI32(0);
+              tmp102 = const i2.WasmI64(0);
+              tmp103 = const i2.WasmI32(0);
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
 
             case i5.TypesErrorCodeInternalError(payload: final value):
-              i2.WasmI32 tmp86;
-              i2.WasmI32 tmp87;
-              i2.WasmI32 tmp88;
-              final tmp89 = value;
-              if (tmp89.hasValue) {
-                final value = tmp89.requireValue();
-                final tmp85 = i0.AllocatedString.allocateUtf16(value);
-                tmp86 = const i2.WasmI32(1);
-                tmp87 = tmp85.ptr;
-                tmp88 = tmp85.packedLength;
-                tmp85.free();
+              i2.WasmI32 tmp95;
+              i2.WasmI32 tmp96;
+              i2.WasmI32 tmp97;
+              final tmp98 = <void Function()>[];
+              final tmp99 = value;
+              if (tmp99.hasValue) {
+                final value = tmp99.requireValue();
+                final tmp94 = i0.AllocatedString.allocateUtf16(value);
+                tmp95 = const i2.WasmI32(1);
+                tmp96 = tmp94.ptr;
+                tmp97 = tmp94.packedLength;
+                tmp98.add(() {
+                  tmp94.free();
+                });
               } else {
-                tmp86 = const i2.WasmI32(0);
-                tmp87 = const i2.WasmI32(0);
-                tmp88 = const i2.WasmI32(0);
+                tmp95 = const i2.WasmI32(0);
+                tmp96 = const i2.WasmI32(0);
+                tmp97 = const i2.WasmI32(0);
               }
-              tmp90 = const i2.WasmI32(38);
-              tmp91 = tmp86;
-              tmp92 = i2.WasmI64.fromInt(tmp87.toIntUnsigned());
-              tmp93 = tmp88;
-              tmp94 = const i2.WasmI32(0);
-              tmp95 = const i2.WasmI32(0);
-              tmp96 = const i2.WasmI32(0);
+              tmp100 = const i2.WasmI32(38);
+              tmp101 = tmp95;
+              tmp102 = i2.WasmI64.fromInt(tmp96.toIntUnsigned());
+              tmp103 = tmp97;
+              tmp104 = const i2.WasmI32(0);
+              tmp105 = const i2.WasmI32(0);
+              tmp106 = const i2.WasmI32(0);
+              tmp107.add(() {
+                for (final f in tmp98) {
+                  f();
+                }
+              });
           }
 
-          tmp97 = const i2.WasmI32(1);
-          tmp98 = tmp90;
-          tmp99 = tmp91;
-          tmp100 = tmp92;
-          tmp101 = tmp93;
-          tmp102 = tmp94;
-          tmp103 = tmp95;
-          tmp104 = tmp96;
+          tmp108 = const i2.WasmI32(1);
+          tmp109 = tmp100;
+          tmp110 = tmp101;
+          tmp111 = tmp102;
+          tmp112 = tmp103;
+          tmp113 = tmp104;
+          tmp114 = tmp105;
+          tmp115 = tmp106;
+          tmp116.add(() {
+            for (final f in tmp107) {
+              f();
+            }
+          });
       }
       _component_0taskReturn(
-        tmp97,
-        tmp98,
-        tmp99,
-        tmp100,
-        tmp101,
-        tmp102,
-        tmp103,
-        tmp104,
+        tmp108,
+        tmp109,
+        tmp110,
+        tmp111,
+        tmp112,
+        tmp113,
+        tmp114,
+        tmp115,
       );
+      for (final f in tmp116) {
+        f();
+      }
     },
     debugName: 'handle',
   );
