@@ -317,8 +317,9 @@ final class StreamReadState<T extends List<Object?>> {
   final int _elementSize;
   int _readBufferSize = -1;
 
-  // If we're in the waiting state, a pending read.
+  // If we have an allocated read buffer.
   _PendingStreamBuffer? _pendingRead;
+  var _waitingForRead = false;
   var _dropped = false;
 
   new(this._controller, this._vtable, this._task, this._id, int bufferSize)
@@ -326,7 +327,14 @@ final class StreamReadState<T extends List<Object?>> {
     _readBufferSize = max(bufferSize ~/ _elementSize, 1);
 
     _task.readStreams[_id] = this;
-    _controller.onResume = _resume;
+    _task.waitable.addWaitable(WasmI32.fromInt(_id));
+    _controller
+      ..onResume = _resume
+      ..onCancel = () {
+        if (!_waitingForRead && !_dropped) {
+          _completeClose();
+        }
+      };
     _startReading();
   }
 
@@ -351,19 +359,23 @@ final class StreamReadState<T extends List<Object?>> {
   }
 
   void _resume() {
-    if (!_dropped) {
+    if (!_dropped && !_waitingForRead) {
       _startReading();
     }
   }
 
   void dispatchEvent(int code) {
+    _waitingForRead = false;
     _dispatchEvent(code, true);
   }
 
   void _dispatchEvent(int code, bool async) {
     readLoop:
     while (true) {
-      if (code == blockedCode) break;
+      if (code == blockedCode) {
+        _waitingForRead = true;
+        break;
+      }
 
       final eventCode = CopyResult.values[code & 0x0f];
       final elementsRead = code >>> 4;
@@ -396,13 +408,23 @@ final class StreamReadState<T extends List<Object?>> {
   }
 
   void _forwardData(bool forwardSynchronously, int elementsRead) {
-    if (_pendingRead case final pending?) {
+    if (_pendingRead case final pending? when elementsRead > 0) {
       final chunk = _vtable.readFromBuffer(
         pending.startPointer + pending.acknowledged * _elementSize,
         elementsRead,
       );
       pending.advance(elementsRead);
-      if (pending.remaining == 0) _pendingRead = null;
+      if (pending.remaining == 0) {
+        if (pending.totalLength > 0) {
+          _vtable.freeBuffer(
+            pending.startPointer,
+            pending.totalLength,
+            pending.totalLength,
+            pending.totalLength,
+          );
+        }
+        _pendingRead = null;
+      }
 
       forwardSynchronously
           ? _controller.addSync(chunk)
@@ -419,6 +441,7 @@ final class StreamReadState<T extends List<Object?>> {
         pending.totalLength,
       );
     }
+    _pendingRead = null;
 
     _vtable.dropReadable(_id);
     _task.readStreams.remove(_id);

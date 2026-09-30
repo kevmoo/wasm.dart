@@ -44,6 +44,21 @@ fn main() -> Result<()> {
             post_event(&TestEvent::RecordedString { value: params.0 });
             Ok(())
         })?;
+        collector.func_wrap(
+            "record-optional-string",
+            |_store, params: (Option<String>,)| {
+                post_event(&TestEvent::RecordedString {
+                    value: params.0.unwrap_or_else(|| "<none>".to_owned()),
+                });
+                Ok(())
+            },
+        )?;
+        collector.func_wrap("record-string-list", |_store, params: (Vec<String>,)| {
+            post_event(&TestEvent::RecordedString {
+                value: params.0.join("|"),
+            });
+            Ok(())
+        })?;
         collector.func_wrap("record-double", |_store, params: (f64,)| {
             post_event(&TestEvent::RecordedDouble { value: params.0 });
             Ok(())
