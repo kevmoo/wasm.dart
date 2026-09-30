@@ -5,10 +5,12 @@ library;
 
 // ignore: import_internal_library
 import 'dart:_wasm';
+import 'dart:convert';
 
 import '../runtime/async/task.dart';
 import 'clock.dart';
 import 'constants.dart';
+import 'dark_arts.dart';
 import 'number_format.dart';
 import 'stack_trace.dart';
 import 'string.dart';
@@ -329,8 +331,9 @@ WasmExternRef stackTraceToString(WasmExternRef? _) {
 
 @pragma('wasm:export')
 WasmExternRef jsonEncodeString(WasmExternRef? line) {
-  // TODO: Actually encode as JSON (not sure what exactly this even does).
-  return line!;
+  final dartString = line!.createDartString();
+  final encoded = json.encode(dartString);
+  return encoded.embedderString.externalize();
 }
 
 @pragma('wasm:export')

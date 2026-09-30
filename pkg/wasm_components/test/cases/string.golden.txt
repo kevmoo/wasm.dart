@@ -29,3 +29,8 @@
 {"type":"string","value":"|a|b|"}
 {"type":"int","value":177}
 {"type":"end","test":5}
+{"type":"start","test":6}
+{"type":"string","value":"123"}
+{"type":"string","value":"string"}
+{"type":"string","value":"\"Hello world\""}
+{"type":"end","test":6}
