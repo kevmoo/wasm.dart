@@ -78,12 +78,3 @@ void _lowerOptionalAndListStrings(BaseResultCollector collector) {
     ..recordStringList(e: const [])
     ..recordStringList(e: const ['alpha', '', 'beta 👋', 'gamma']);
 }
-
-void _lowerOptionalAndListStrings(BaseResultCollector collector) {
-  collector
-    ..recordOptionalString(e: null)
-    ..recordOptionalString(e: '')
-    ..recordOptionalString(e: 'hello 👋')
-    ..recordStringList(e: const [])
-    ..recordStringList(e: const ['alpha', '', 'beta 👋', 'gamma']);
-}
