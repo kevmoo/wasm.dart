@@ -10,6 +10,7 @@ void main() {
     _lowerUpper,
     _utf8RoundTrip,
     _stringCompareAndReplace,
+    _errorSafeToString,
     _lowerOptionalAndListStrings,
   ]);
 }
@@ -60,6 +61,13 @@ void _stringCompareAndReplace(BaseResultCollector collector) {
     //    ..recordString(e: 'a-b-a-c'.replaceAll('a', 'x'))
     //    ..recordString(e: 'ab'.replaceAll('', '|'))
     ..recordInt(e: 'Hi'.codeUnits.reduce((a, b) => a + b));
+}
+
+void _errorSafeToString(BaseResultCollector collector) {
+  collector
+    ..recordString(e: Error.safeToString(123))
+    ..recordString(e: 'string')
+    ..recordString(e: '"Hello world"');
 }
 
 void _lowerOptionalAndListStrings(BaseResultCollector collector) {
