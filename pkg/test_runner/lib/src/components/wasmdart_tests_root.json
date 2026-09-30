@@ -21,6 +21,38 @@
       "definition": {
         "Instance": {
           "interface": 0,
+          "function_name": "record-optional-string"
+        }
+      },
+      "lower_options": {
+        "uses_memory": true,
+        "uses_strings": true,
+        "uses_realloc": false,
+        "is_async": false,
+        "uses_callback": false
+      }
+    },
+    {
+      "import_name": "_import2",
+      "definition": {
+        "Instance": {
+          "interface": 0,
+          "function_name": "record-string-list"
+        }
+      },
+      "lower_options": {
+        "uses_memory": true,
+        "uses_strings": true,
+        "uses_realloc": true,
+        "is_async": false,
+        "uses_callback": false
+      }
+    },
+    {
+      "import_name": "_import3",
+      "definition": {
+        "Instance": {
+          "interface": 0,
           "function_name": "record-double"
         }
       },
@@ -33,7 +65,7 @@
       }
     },
     {
-      "import_name": "_import2",
+      "import_name": "_import4",
       "definition": {
         "Instance": {
           "interface": 0,
@@ -49,7 +81,7 @@
       }
     },
     {
-      "import_name": "_import3",
+      "import_name": "_import5",
       "definition": {
         "Instance": {
           "interface": 0,
@@ -137,6 +169,26 @@
               }
             ]
           },
+          "record-optional-string": {
+            "name": "record-optional-string",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "e",
+                "type": 0
+              }
+            ]
+          },
+          "record-string-list": {
+            "name": "record-string-list",
+            "kind": "freestanding",
+            "params": [
+              {
+                "name": "e",
+                "type": 1
+              }
+            ]
+          },
           "record-double": {
             "name": "record-double",
             "kind": "freestanding",
@@ -194,7 +246,22 @@
         "package": 0
       }
     ],
-    "types": [],
+    "types": [
+      {
+        "name": null,
+        "kind": {
+          "option": "string"
+        },
+        "owner": null
+      },
+      {
+        "name": null,
+        "kind": {
+          "list": "string"
+        },
+        "owner": null
+      }
+    ],
     "packages": [
       {
         "name": "wasmdart:tests",

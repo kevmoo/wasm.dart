@@ -110,7 +110,7 @@ WasmI32 writeFuture<T>(Future<T> future, FutureVtable<T> vtable) {
     Task.forCurrentZone(),
   );
 
-  unawaited(future.then(writable.writeValue));
+  future.then(writable.writeValue).ignore();
   return WasmI32.fromInt(readableEnd);
 }
 

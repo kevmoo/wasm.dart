@@ -11,6 +11,7 @@ void main() {
     _utf8RoundTrip,
     _stringCompareAndReplace,
     _errorSafeToString,
+    _lowerOptionalAndListStrings,
   ]);
 }
 
@@ -67,4 +68,13 @@ void _errorSafeToString(BaseResultCollector collector) {
     ..recordString(e: Error.safeToString(123))
     ..recordString(e: Error.safeToString('string'))
     ..recordString(e: Error.safeToString('"Hello world"'));
+}
+
+void _lowerOptionalAndListStrings(BaseResultCollector collector) {
+  collector
+    ..recordOptionalString(e: null)
+    ..recordOptionalString(e: '')
+    ..recordOptionalString(e: 'hello 👋')
+    ..recordStringList(e: const [])
+    ..recordStringList(e: const ['alpha', '', 'beta 👋', 'gamma']);
 }

@@ -32,3 +32,10 @@
 {"type":"string","value":"\"string\""}
 {"type":"string","value":"\"\\\"Hello world\\\"\""}
 {"type":"end","test":6}
+{"type":"start","test":7}
+{"type":"string","value":"<none>"}
+{"type":"string","value":""}
+{"type":"string","value":"hello 👋"}
+{"type":"string","value":""}
+{"type":"string","value":"alpha||beta 👋|gamma"}
+{"type":"end","test":7}
