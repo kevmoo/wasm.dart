@@ -33,7 +33,7 @@ Okay, that alone wouldn't be too impressive. But it's also running in <em>wasmti
 </p<>
 
 <p>
-This is request number ${_requestId++} served by this server.
+This is request number ${_requestId++} served by this instance.
 </p>
 </body>
 </html>
