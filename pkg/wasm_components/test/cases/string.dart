@@ -12,6 +12,7 @@ void main() {
     _stringCompareAndReplace,
     _errorSafeToString,
     _lowerOptionalAndListStrings,
+    _fromCharCodes,
   ]);
 }
 
@@ -77,4 +78,25 @@ void _lowerOptionalAndListStrings(BaseResultCollector collector) {
     ..recordOptionalString(e: 'hello 👋')
     ..recordStringList(e: const [])
     ..recordStringList(e: const ['alpha', '', 'beta 👋', 'gamma']);
+}
+
+void _fromCharCodes(BaseResultCollector collector) {
+  // ascii
+  collector.recordString(e: String.fromCharCodes([104, 101, 108, 108, 111]));
+  // latin1
+  collector.recordString(e: String.fromCharCodes([0xe9, 0xfc, 0xdf]));
+  // bmp
+  collector.recordString(e: String.fromCharCodes([0x03a9, 0x4e2d]));
+  // astral
+  collector.recordString(e: String.fromCharCodes([0x1f600]));
+  // The emoji 😀 is stored as a surrogate pair.
+  collector.recordString(e: String.fromCharCodes([0xd83d, 0xde00]));
+  collector.recordString(e: 'a${String.fromCharCodes([0xd83d, 0xde00])}b');
+  collector.recordString(e: String.fromCharCodes(<int>[]));
+
+  // subranges
+  const codes = [0x78, 0x41, 0x1f600, 0x42, 0x79];
+  collector.recordString(e: String.fromCharCodes(codes, 1, 4));
+  collector.recordString(e: String.fromCharCodes(codes, 3));
+  collector.recordString(e: String.fromCharCodes(codes, 2, 2));
 }

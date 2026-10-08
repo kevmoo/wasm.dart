@@ -41,3 +41,15 @@
 {"type":"string","value":""}
 {"type":"string","value":"alpha||beta 👋|gamma"}
 {"type":"end","test":7}
+{"type":"start","test":8}
+{"type":"string","value":"hello"}
+{"type":"string","value":"éüß"}
+{"type":"string","value":"Ω中"}
+{"type":"string","value":"😀"}
+{"type":"string","value":"😀"}
+{"type":"string","value":"a😀b"}
+{"type":"string","value":""}
+{"type":"string","value":"A😀B"}
+{"type":"string","value":"By"}
+{"type":"string","value":""}
+{"type":"end","test":8}
