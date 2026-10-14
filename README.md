@@ -86,8 +86,8 @@ __Legend__:
 | f64ToExponential                         |             | 🎯        |                               |
 | f64ToExponentialWithFractionDigits       |             | 🎯        |                               |
 | f64ToPrecision                           |             | 🎯        |                               |
-| f64ToFixed                               |             | 🎯        |                               |
-| f64ToString                              |             | 🎯        | Currently a stub              |
+| f64ToFixed                               | ✅          | 🎯        |                               |
+| f64ToString                              | ✅          | 🎯        |                               |
 | stringBufferCreate                       | ✅          | 🎯        |                               |
 | stringBufferWriteString                  | ✅          | 🎯        |                               |
 | stringBufferWriteCharCode                | ✅          | 🎯        |                               |

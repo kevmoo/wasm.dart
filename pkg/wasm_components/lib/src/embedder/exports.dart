@@ -12,6 +12,8 @@ import 'clock.dart';
 import 'constants.dart';
 import 'dark_arts.dart';
 import 'number_format.dart';
+import 'numbers/ryu.dart';
+import 'numbers/to_fixed.dart';
 import 'stack_trace.dart';
 import 'string.dart';
 import 'string_buffer.dart';
@@ -95,7 +97,17 @@ WasmExternRef i64ToString(WasmI64 value, WasmI32 radix) {
 
 @pragma('wasm:export')
 WasmExternRef f64ToString(WasmF64 value) {
-  throw UnimplementedError('f64ToString');
+  return formatDouble(value.toDouble()).externalize();
+}
+
+@pragma('wasm:export')
+WasmExternRef f64ToFixed(WasmF64 value, WasmI32 fractionDigits) {
+  final digits = fractionDigits.toIntUnsigned();
+  if (digits > maxFixedFractionDigits) {
+    throw RangeError.range(digits, 0, maxFixedFractionDigits, 'fractionDigits');
+  }
+
+  return formatDoubleToFixed(value.toDouble(), digits).externalize();
 }
 
 @pragma('wasm:export')

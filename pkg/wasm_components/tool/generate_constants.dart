@@ -22,6 +22,46 @@ import 'string.dart';
     );
   }
 
+  /// Defines a table of unsigned integers with [limbs] 64-bit limbs each as a
+  /// flat array of 64-bit integers, storing limb `k` (from least significant
+  /// to most significant) of entry `i` at `limbs * i + k`.
+  void defineWideTable(
+    String constantName,
+    List<BigInt> values,
+    String doc, {
+    int limbs = 2,
+  }) {
+    final mask = (BigInt.one << 64) - BigInt.one;
+    final elements = <String>[];
+    for (final value in values) {
+      if (value.bitLength > 64 * limbs) {
+        throw ArgumentError('$value does not fit into $limbs limbs');
+      }
+      for (var k = 0; k < limbs; k++) {
+        elements.add(((value >> (64 * k)) & mask).toSigned(64).toString());
+      }
+    }
+
+    buffer.writeln(
+      '/// Entry `i` (split into $limbs 64-bit limbs, least significant '
+      'first) is $doc.',
+    );
+    buffer.writeln(
+      'const WasmArray<WasmI64> $constantName = WasmArray.literal(['
+      '${elements.join(', ')}'
+      ']);',
+    );
+  }
+
+  void defineI16Array(String constantName, List<int> values, String doc) {
+    buffer.writeln('/// $doc');
+    buffer.writeln(
+      'const WasmArray<WasmI16> $constantName = WasmArray.literal(['
+      '${values.join(', ')}'
+      ']);',
+    );
+  }
+
   void defineString(
     String constantName,
     String contents, {
@@ -45,6 +85,127 @@ import 'string.dart';
   defineCharCodes('digits', '0123456789abcdefghijklmnopqrstuvwxyz');
   defineString('unknownTimezone', 'UNKNOWN TZ');
   defineString('stubRootUri', 'cm-root:/');
+  defineString('nan', 'NaN');
+  defineString('infinity', 'Infinity');
+  defineString('negativeInfinity', '-Infinity');
+  defineString('zeroDouble', '0.0');
+  defineString('negativeZeroDouble', '-0.0');
+
+  // Tables for the Ryū double-to-string algorithm, see lib/src/embedder/numbers/ryu.dart.
+  const pow5InvBitCount = 125;
+  const pow5BitCount = 125;
+  final pow5Split = <BigInt>[];
+  final pow5InvSplit = <BigInt>[];
+  for (var i = 0; i < 342; i++) {
+    final pow = BigInt.from(5).pow(i);
+    final pow5Len = pow.bitLength;
+
+    if (i < 326) {
+      // floor(5^i * 2^(pow5BitCount - bitlength(5^i)))
+      final j = pow5Len - pow5BitCount;
+      pow5Split.add(j >= 0 ? pow >> j : pow << -j);
+    }
+
+    // floor(2^(bitlength(5^i) - 1 + pow5InvBitCount) / 5^i) + 1
+    final j = pow5Len - 1 + pow5InvBitCount;
+    pow5InvSplit.add((BigInt.one << j) ~/ pow + BigInt.one);
+  }
+  defineWideTable(
+    'doublePow5InvSplit',
+    pow5InvSplit,
+    '`floor(2^(bitlength(5^i) - 1 + 125) / 5^i) + 1`',
+  );
+  defineWideTable('doublePow5Split', pow5Split, '`5^i` normalized to 125 bits');
+
+  // Tables for Number.prototype.toFixed, see lib/src/embedder/numbers/to_fixed.dart.
+  // These are the tables from Ryū's d2fixed (in the variant from ryu-js), only
+  // including entries required for up to 100 fraction digits.
+  {
+    const pow10AdditionalBits = 120;
+    const maxIndex = 2; // indexForExponent(maxE2)
+    final pow10Split = <BigInt>[];
+    final pow10Offset = <int>[];
+    for (var idx = 0; idx <= maxIndex; idx++) {
+      pow10Offset.add(pow10Split.length);
+      final length = (((16 * idx * 78913) >> 18) + 1 + 16 + 8) ~/ 9;
+      for (var i = 0; i < length; i++) {
+        // floor(2^(16 * idx + 120) / 10^(9 * i)) + 1
+        pow10Split.add(
+          (BigInt.one << (16 * idx + pow10AdditionalBits)) ~/
+                  BigInt.from(10).pow(9 * i) +
+              BigInt.one,
+        );
+      }
+    }
+    pow10Offset.add(pow10Split.length);
+
+    defineWideTable(
+      'pow10Split',
+      pow10Split,
+      '`floor(2^(16 * idx + 120) / 10^(9 * i)) + 1` for block `i` of index '
+          '`idx` (starting at `pow10Offset[idx]`)',
+      limbs: 3,
+    );
+    defineI16Array(
+      'pow10Offset',
+      pow10Offset,
+      'Start offsets of each index in `pow10Split`.',
+    );
+
+    const additionalBits2 = 120;
+    const tableSize2 = 27;
+    // We only support up to 100 fraction digits, so blocks of 9 digits >= 12
+    // are never used.
+    const maxBlocks = 12;
+    final modulus = BigInt.from(10).pow(9) << 136;
+    final pow10Split2 = <BigInt>[];
+    final pow10Offset2 = <int>[];
+    final minBlock2 = <int>[];
+
+    for (var idx = 0; idx < tableSize2; idx++) {
+      // Blocks before minBlock are always zero for doubles with this index
+      // (since m2 * 2^e2 < 2^54 * 2^(-16 * idx)).
+      var minBlock = 0;
+      while ((BigInt.one << 54) * BigInt.from(10).pow(9 * (minBlock + 1)) <=
+          BigInt.one << (16 * idx)) {
+        minBlock++;
+      }
+      // There are at most 16 * idx + 16 non-zero fractional digits.
+      var endBlock = (16 * idx + 16 + 8) ~/ 9;
+      if (endBlock > maxBlocks) endBlock = maxBlocks;
+
+      minBlock2.add(minBlock);
+      pow10Offset2.add(pow10Split2.length);
+      for (var i = minBlock; i < endBlock; i++) {
+        // floor(10^(9 * (i + 1)) * 2^(120 - 16 * idx)) mod (10^9 * 2^136)
+        final pow10 = BigInt.from(10).pow(9 * (i + 1));
+        final shift = additionalBits2 - 16 * idx;
+        final value = shift >= 0 ? pow10 << shift : pow10 >> -shift;
+        pow10Split2.add(value % modulus);
+      }
+    }
+    pow10Offset2.add(pow10Split2.length);
+
+    defineWideTable(
+      'pow10Split2',
+      pow10Split2,
+      '`floor(10^(9 * (i + 1)) * 2^(120 - 16 * idx)) mod (10^9 * 2^136)` for '
+          'block `i` of index `idx` (starting at '
+          '`pow10Offset2[idx] + i - minBlock2[idx]`)',
+      limbs: 3,
+    );
+    defineI16Array(
+      'pow10Offset2',
+      pow10Offset2,
+      'Start offsets of each index in `pow10Split2`.',
+    );
+    defineI16Array(
+      'minBlock2',
+      minBlock2,
+      'For each index, the amount of leading 9-digit fraction blocks that are '
+          'always zero.',
+    );
+  }
 
   File('lib/src/embedder/constants.dart').writeAsStringSync(buffer.toString());
 }
