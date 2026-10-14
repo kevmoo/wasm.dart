@@ -48,7 +48,7 @@ __Legend__:
 | queueMicrotask                           | ✅          | 🎯        |                               |
 | clearSchedule                            | ✅          | 📦        |                               |
 | currentTimeMicros                        | ✅          | 📦        |                               |
-| stringFromCharCodeArray                  |             | 🎯        |                               |
+| stringFromCharCodeArray                  | ✅          | 🎯        |                               |
 | stringFromAsciiBytes                     | ✅          | 🎯        |                               |
 | stringLength                             | ✅          | 🎯        |                               |
 | stringEquals                             | ✅          | 🎯        |                               |
