@@ -18,9 +18,6 @@ const _doubleBias = 1023;
 const _pow10AdditionalBits = 120;
 const _additionalBits2 = 120;
 
-/// The largest index into `pow10Offset2` and `minBlock2`.
-const _maxPow10Split2Index = 26;
-
 /// The maximum amount of [fractionDigits] supported by [formatDoubleToFixed].
 const maxFixedFractionDigits = 100;
 
@@ -76,12 +73,14 @@ Latin1String formatDoubleToFixed(double value, int fractionDigits) {
   if (e2 >= -_doubleMantissaBits) {
     final idx = e2 < 0 ? 0 : (e2 + 15) ~/ 16;
     final p10bits = 16 * idx + _pow10AdditionalBits;
+    // Doubles below 1e21 have all blocks in the table.
+    assert(constants.pow10MinBlock.readUnsigned(idx) == 0);
     final offset = constants.pow10Offset.readUnsigned(idx);
     final len = constants.pow10Offset.readUnsigned(idx + 1) - offset;
 
     for (var i = len - 1; i >= 0; i--) {
       final j = p10bits - e2;
-      final digits = _mulShiftMod1e9(
+      final digits = mulShiftMod1e9(
         m2 << 8,
         constants.pow10Split,
         offset + i,
@@ -90,7 +89,7 @@ Latin1String formatDoubleToFixed(double value, int fractionDigits) {
       if (nonzero) {
         out.appendDigits(digits, 9);
       } else if (digits != 0) {
-        out.appendDigits(digits, _decimalLength9(digits));
+        out.appendDigits(digits, decimalLength9(digits));
         nonzero = true;
       }
     }
@@ -108,8 +107,7 @@ Latin1String formatDoubleToFixed(double value, int fractionDigits) {
   }
 
   // Fractional part, also in blocks of 9 digits.
-  var idx = -e2 ~/ 16;
-  if (idx > _maxPow10Split2Index) idx = _maxPow10Split2Index;
+  final idx = -e2 ~/ 16;
   final minBlock = constants.minBlock2.readUnsigned(idx);
   final offset = constants.pow10Offset2.readUnsigned(idx);
   final end = constants.pow10Offset2.readUnsigned(idx + 1);
@@ -130,7 +128,7 @@ Latin1String formatDoubleToFixed(double value, int fractionDigits) {
         break;
       }
 
-      var digits = _mulShiftMod1e9(m2 << 8, constants.pow10Split2, p, j + 8);
+      var digits = mulShiftMod1e9(m2 << 8, constants.pow10Split2, p, j + 8);
       if (i < blocks - 1) {
         out.appendDigits(digits, 9);
       } else {
@@ -226,7 +224,7 @@ final class _Output {
   }
 }
 
-int _decimalLength9(int v) {
+int decimalLength9(int v) {
   assert(v >= 0 && v < 1000000000);
   var length = 1;
   var threshold = 10;
@@ -239,7 +237,7 @@ int _decimalLength9(int v) {
 
 /// Computes `((m * mul) >> j) % 10^9`, where `mul` is the 192-bit entry at
 /// [index] in [table].
-int _mulShiftMod1e9(int m, WasmArray<WasmI64> table, int index, int j) {
+int mulShiftMod1e9(int m, WasmArray<WasmI64> table, int index, int j) {
   assert(j >= 128 && j <= 180);
   final mul0 = table.read(3 * index);
   final mul1 = table.read(3 * index + 1);

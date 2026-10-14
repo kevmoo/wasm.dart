@@ -21,8 +21,8 @@ const _doublePow5BitCount = 125;
 
 const char0 = 0x30; // '0'
 const charDot = 0x2e; // '.'
-const _charE = 0x65; // 'e'
-const _charPlus = 0x2b; // '+'
+const charE = 0x65; // 'e'
+const charPlus = 0x2b; // '+'
 const charMinus = 0x2d; // '-'
 
 Latin1String formatDouble(double value) {
@@ -43,8 +43,8 @@ Latin1String formatDouble(double value) {
     return sign ? constants.negativeZeroDouble : constants.zeroDouble;
   }
 
-  final (mantissa, exponent) = _d2d(ieeeMantissa, ieeeExponent);
-  final length = _decimalLength17(mantissa);
+  final (mantissa, exponent) = d2d(ieeeMantissa, ieeeExponent);
+  final length = decimalLength17(mantissa);
   // 10^(kk-1) <= v < 10^kk
   final kk = length + exponent;
   final start = sign ? 1 : 0;
@@ -94,7 +94,7 @@ Latin1String formatDouble(double value) {
       // 1e+30
       result = WasmArray(start + 3 + exponentLength);
       result.write(start, char0 + mantissa);
-      result.write(start + 1, _charE);
+      result.write(start + 1, charE);
     } else {
       // 1234e30 -> 1.234e+33
       result = WasmArray(start + length + 3 + exponentLength);
@@ -106,11 +106,11 @@ Latin1String formatDouble(double value) {
       );
       result.write(start, char0 + first);
       result.write(start + 1, charDot);
-      result.write(start + length + 1, _charE);
+      result.write(start + length + 1, charE);
     }
 
     final exponentStart = result.length - exponentLength - 1;
-    result.write(exponentStart, scientificExponent < 0 ? charMinus : _charPlus);
+    result.write(exponentStart, scientificExponent < 0 ? charMinus : charPlus);
     writeDigits(result, result.length, absExponent, exponentLength);
   }
 
@@ -133,7 +133,7 @@ int writeDigits(WasmArray<WasmI8> target, int end, int value, int count) {
   return value;
 }
 
-int _decimalLength17(int v) {
+int decimalLength17(int v) {
   assert(v >= 0 && v < 100000000000000000);
   var length = 1;
   var threshold = 10;
@@ -228,7 +228,7 @@ const _signBit = -0x8000000000000000;
 /// Converts a finite, non-zero double (given by its IEEE mantissa and
 /// exponent) into the shortest decimal `mantissa * 10^exponent` that rounds
 /// back to the same double.
-(int, int) _d2d(int ieeeMantissa, int ieeeExponent) {
+(int, int) d2d(int ieeeMantissa, int ieeeExponent) {
   final int e2, m2;
   if (ieeeExponent == 0) {
     e2 = 1 - _doubleBias - _doubleMantissaBits - 2;

@@ -13,6 +13,7 @@ import 'constants.dart';
 import 'dark_arts.dart';
 import 'number_format.dart';
 import 'numbers/ryu.dart';
+import 'numbers/to_exponential.dart';
 import 'numbers/to_fixed.dart';
 import 'stack_trace.dart';
 import 'string.dart';
@@ -108,6 +109,39 @@ WasmExternRef f64ToFixed(WasmF64 value, WasmI32 fractionDigits) {
   }
 
   return formatDoubleToFixed(value.toDouble(), digits).externalize();
+}
+
+@pragma('wasm:export')
+WasmExternRef f64ToExponential(WasmF64 value) {
+  return formatDoubleToExponential(value.toDouble(), null).externalize();
+}
+
+@pragma('wasm:export')
+WasmExternRef f64ToExponentialWithFractionDigits(
+  WasmF64 value,
+  WasmI32 fractionDigits,
+) {
+  final digits = fractionDigits.toIntUnsigned();
+  if (digits > maxExponentialFractionDigits) {
+    throw RangeError.range(
+      digits,
+      0,
+      maxExponentialFractionDigits,
+      'fractionDigits',
+    );
+  }
+
+  return formatDoubleToExponential(value.toDouble(), digits).externalize();
+}
+
+@pragma('wasm:export')
+WasmExternRef f64ToPrecision(WasmF64 value, WasmI32 precision) {
+  final dartPrecision = precision.toIntUnsigned();
+  if (dartPrecision < 1 || dartPrecision > maxPrecision) {
+    throw RangeError.range(dartPrecision, 1, maxPrecision, 'precision');
+  }
+
+  return formatDoubleToPrecision(value.toDouble(), dartPrecision).externalize();
 }
 
 @pragma('wasm:export')

@@ -83,9 +83,9 @@ __Legend__:
 | tryParseResultGetDouble                  |             | 🎯        |                               |
 | doubleParseInfallible                    |             | 🎯        |                               |
 | i64ToString                              | ✅          | 🎯        | Needs optimization for base10 |
-| f64ToExponential                         |             | 🎯        |                               |
-| f64ToExponentialWithFractionDigits       |             | 🎯        |                               |
-| f64ToPrecision                           |             | 🎯        |                               |
+| f64ToExponential                         | ✅          | 🎯        |                               |
+| f64ToExponentialWithFractionDigits       | ✅          | 🎯        |                               |
+| f64ToPrecision                           | ✅          | 🎯        |                               |
 | f64ToFixed                               | ✅          | 🎯        |                               |
 | f64ToString                              | ✅          | 🎯        |                               |
 | stringBufferCreate                       | ✅          | 🎯        |                               |
