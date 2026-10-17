@@ -13,6 +13,16 @@ final class RegexParser(
   final _length = string.length;
   var _position = 0;
 
+  /// The amount of capturing groups opened so far.
+  ///
+  /// Since groups are numbered by the position of their opening parenthesis,
+  /// this is also the index of the most recently opened group.
+  var _openedGroups = 0;
+
+  /// The total amount of capturing groups in the pattern, required to resolve
+  /// backreferences (which may refer to groups defined later).
+  late final int _totalGroups = _countCapturingGroups();
+
   bool get _isAtEnd => _position == _length;
 
   int _peek() {
@@ -39,6 +49,21 @@ final class RegexParser(
     return false;
   }
 
+  bool _matchMultiple(List<int> charcodes) {
+    if (_position + charcodes.length > _length) {
+      return false;
+    }
+
+    for (var i = 0; i < charcodes.length; i++) {
+      if (string.codeUnitAtUnchecked(_position + i) != charcodes[i]) {
+        return false;
+      }
+    }
+
+    _position += charcodes.length;
+    return true;
+  }
+
   void _require(int charcode) {
     if (!_match(charcode)) {
       _error('Expected ${String.fromCharCode(charcode)} here');
@@ -49,7 +74,7 @@ final class RegexParser(
     throw FormatException(message, string.toString(), _position);
   }
 
-  Node parse() {
+  Regex parse() {
     if (options.unicode) {
       _error('Unicode flag is not currently supported');
     }
@@ -58,7 +83,44 @@ final class RegexParser(
     if (!_isAtEnd) {
       _error('Expected regular expression to end here');
     }
-    return node;
+    assert(_openedGroups == _totalGroups);
+    return Regex(node, groupCount: _openedGroups);
+  }
+
+  /// Counts capturing groups in the entire pattern, following
+  /// https://tc39.es/ecma262/#sec-countleftcapturingparenswithin.
+  ///
+  /// This runs before parsing so that backreferences to groups that appear
+  /// later in the pattern can be resolved.
+  int _countCapturingGroups() {
+    var count = 0;
+    var inClass = false;
+
+    for (var i = 0; i < _length; i++) {
+      final char = string.codeUnitAtUnchecked(i);
+      if (char == $backslash) {
+        // Skip the escaped character.
+        i++;
+      } else if (inClass) {
+        if (char == $rbracket) inClass = false;
+      } else if (char == $lbracket) {
+        inClass = true;
+      } else if (char == $lparen) {
+        if (i + 1 < _length && string.codeUnitAtUnchecked(i + 1) == $question) {
+          // Only (?<name> is capturing, (?<= and (?<! are lookbehinds.
+          if (i + 3 < _length &&
+              string.codeUnitAtUnchecked(i + 2) == $lt &&
+              string.codeUnitAtUnchecked(i + 3) != $equal &&
+              string.codeUnitAtUnchecked(i + 3) != $exclamation) {
+            count++;
+          }
+        } else {
+          count++;
+        }
+      }
+    }
+
+    return count;
   }
 
   Node _disjunction() {
@@ -98,6 +160,7 @@ final class RegexParser(
     consumeAtom:
     while (!_isAtEnd) {
       var isAssertion = false;
+      final groupsBeforeAtom = _openedGroups;
       Node next;
 
       final firstChar = _peek();
@@ -116,8 +179,47 @@ final class RegexParser(
         case $dot:
           _advance();
           next = MatchAny(options.dotAll);
-        case $backslash:
         case $lparen:
+          if (_matchMultiple(const [$lparen, $question, $equal])) {
+            // (?=, positive lookahead.
+            _error('todo');
+          } else if (_matchMultiple(const [$lparen, $question, $exclamation])) {
+            // (?!, negative lookahead
+            _error('todo');
+          } else if (_matchMultiple(const [$lparen, $question, $lt, $equal])) {
+            // (?<=, positive lookbehind
+            _error('todo');
+          } else if (_matchMultiple(const [
+            $lparen,
+            $question,
+            $lt,
+            $exclamation,
+          ])) {
+            // (?<!, negative lookbehind
+            _error('todo');
+          } else if (_matchMultiple(const [$lparen, $question, $colon])) {
+            // (?:, non-capturing group
+            next = _disjunction();
+          } else {
+            // Capturing group.
+            _advance();
+
+            if (_match($question)) {
+              _require($lt);
+              _error('todo: named groups');
+              // ignore: dead_code
+              _require($gt);
+            }
+
+            final index = ++_openedGroups;
+            final contents = _disjunction();
+            next = CaptureGroup(contents, index);
+          }
+
+          _require($rparen);
+        case $backslash:
+          _advance();
+          next = _atomEscape();
         case $lbracket:
           _advance();
           _error('todo');
@@ -134,7 +236,7 @@ final class RegexParser(
 
           _advance();
           // Everything else: SyntaxCharacter
-          if (options.caseSensitive) {
+          if (!options.caseSensitive) {
             final matchedCharCodes = [firstChar];
 
             final upper = charToUpper(firstChar);
@@ -156,9 +258,17 @@ final class RegexParser(
       if (!isAssertion) {
         final savedOffset = _position;
         try {
-          next = _maybeWrapInQuantifier(next);
+          next = _maybeWrapInQuantifier(
+            next,
+            firstCapture: groupsBeforeAtom + 1,
+            captureCount: _openedGroups - groupsBeforeAtom,
+          );
         } on FormatException {
           _position = savedOffset;
+        }
+
+        if (next case Quantifier(:final min, :final max?) when min > max) {
+          _error('Quantifier has min > max');
         }
       }
 
@@ -177,7 +287,34 @@ final class RegexParser(
     };
   }
 
-  Node _maybeWrapInQuantifier(Node inner) {
+  /// Parses the part of an AtomEscape after the backslash.
+  ///
+  /// https://tc39.es/ecma262/#prod-AtomEscape
+  Node _atomEscape() {
+    if (_isAtEnd) _error('Expected escape sequence');
+
+    final first = _peek();
+    if (first > $0 && first <= $9) {
+      // https://tc39.es/ecma262/#prod-DecimalEscape. Without the unicode flag,
+      // this is only a backreference if the group exists (Annex B).
+      final start = _position;
+      final index = _decimalDigits()!;
+      if (index <= _totalGroups) {
+        return BackReference(index, ignoreCase: !options.caseSensitive);
+      }
+
+      // Otherwise, this is a legacy octal escape or an identity escape.
+      _position = start;
+    }
+
+    _error('todo');
+  }
+
+  Node _maybeWrapInQuantifier(
+    Node inner, {
+    required int firstCapture,
+    required int captureCount,
+  }) {
     if (_isAtEnd) return inner;
 
     int min;
@@ -210,7 +347,14 @@ final class RegexParser(
     }
 
     final lazy = _match($question);
-    return Quantifier(inner, min: min, max: max, greedy: !lazy);
+    return Quantifier(
+      inner,
+      min: min,
+      max: max,
+      greedy: !lazy,
+      firstCapture: firstCapture,
+      captureCount: captureCount,
+    );
   }
 
   int? _decimalDigits() {
@@ -218,7 +362,7 @@ final class RegexParser(
 
     // https://tc39.es/ecma262/#prod-DecimalDigits
     final first = _peek();
-    if (first < $0 || first >= $9) return null;
+    if (first < $0 || first > $9) return null;
     _advance();
 
     var value = first - $0;

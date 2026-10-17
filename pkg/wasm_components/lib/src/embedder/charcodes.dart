@@ -1,6 +1,15 @@
 @internal
 import 'package:meta/meta.dart';
 
+/// "Line feed" control character.
+const int $lf = 0x0a;
+
+/// "Carriage return" control character.
+const int $cr = 0x0d;
+
+/// Character `!`.
+const int $exclamation = 0x21;
+
 /// Character `$`.
 const int $$ = 0x24;
 
@@ -30,6 +39,18 @@ const int $0 = 0x30;
 
 /// Character `9`.
 const int $9 = 0x39;
+
+/// Character `:`.
+const int $colon = 0x3a;
+
+/// Character `<`.
+const int $lt = 0x3c;
+
+/// Character `<`.
+const int $equal = 0x3d;
+
+/// Character `>`.
+const int $gt = 0x3e;
 
 /// Character `?`.
 const int $question = 0x3f;

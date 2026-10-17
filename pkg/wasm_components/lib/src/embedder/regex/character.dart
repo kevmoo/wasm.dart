@@ -1,40 +1,37 @@
 import '../charcodes.dart';
 import 'regex.dart';
 
-final class const MatchAny(final bool dotAll) extends Node {
+/// A node matching exactly one code unit if it satisfies [matchesCodeUnit].
+abstract base class const SingleCodeUnitNode() extends Node {
+  bool matchesCodeUnit(int codeUnit);
+
   @override
-  Iterable<Null> matches(
-    RegexString string,
-    PendingMatch match,
-    int start,
-    bool exact,
-  ) {
-    throw UnimplementedError();
+  bool match(MatchState state, int position, Continuation next) {
+    return position < state.length &&
+        matchesCodeUnit(state.codeUnitAt(position)) &&
+        next(position + 1);
   }
 }
 
-final class MatchSingleCharacter(final int codeUnit) extends Node {
+/// Matches `.`, which is any character except for line terminators unless
+/// [dotAll] is set.
+final class const MatchAny(final bool dotAll) extends SingleCodeUnitNode {
   @override
-  Iterable<Null> matches(
-    RegexString string,
-    PendingMatch match,
-    int start,
-    bool exact,
-  ) {
-    throw UnimplementedError();
+  bool matchesCodeUnit(int codeUnit) {
+    return dotAll || !isLineTerminator(codeUnit);
   }
 }
 
-final class MatchCharacterInList(final List<int> charCodes) extends Node {
+final class const MatchSingleCharacter(final int codeUnit)
+    extends SingleCodeUnitNode {
   @override
-  Iterable<Null> matches(
-    RegexString string,
-    PendingMatch match,
-    int start,
-    bool exact,
-  ) {
-    throw UnimplementedError();
-  }
+  bool matchesCodeUnit(int codeUnit) => codeUnit == this.codeUnit;
+}
+
+final class const MatchCharacterInList(final List<int> charCodes)
+    extends SingleCodeUnitNode {
+  @override
+  bool matchesCodeUnit(int codeUnit) => charCodes.contains(codeUnit);
 }
 
 int charToUpper(int code) {

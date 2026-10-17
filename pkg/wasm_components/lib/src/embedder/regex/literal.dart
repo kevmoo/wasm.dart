@@ -5,33 +5,30 @@ final class LiteralNode(final RegexString needle) extends Node {
   final int _needleLength = needle.length;
 
   @override
-  Iterable<Null> matches(
-    RegexString string,
-    PendingMatch match,
-    int start,
-    bool exact,
-  ) sync* {
-    // TODO: Use better string searching algorithm.
-    final length = string.length;
+  bool match(MatchState state, int position, Continuation next) {
+    return _matchesAt(state.input, position) && next(position + _needleLength);
+  }
 
-    while (start + _needleLength <= length) {
-      var matchesHere = true;
-      for (var j = 0; j < _needleLength; j++) {
-        if (string.codeUnitAtUnchecked(start + j) !=
-            needle.codeUnitAtUnchecked(j)) {
-          matchesHere = false;
-          break;
-        }
-      }
-      if (matchesHere) {
-        match.startOffset = start;
-        match.endOffset = start + _needleLength;
-        yield null;
-      }
+  bool _matchesAt(RegexString string, int position) {
+    if (position + _needleLength > string.length) return false;
 
-      start++;
-      if (exact) return;
+    for (var j = 0; j < _needleLength; j++) {
+      if (string.codeUnitAtUnchecked(position + j) !=
+          needle.codeUnitAtUnchecked(j)) {
+        return false;
+      }
     }
+    return true;
+  }
+
+  /// Returns the first index `>= start` at which [needle] appears in [string],
+  /// or `-1`.
+  int firstIndexOf(RegexString string, int start) {
+    // TODO: Use better string searching algorithm.
+    for (var i = start; i + _needleLength <= string.length; i++) {
+      if (_matchesAt(string, i)) return i;
+    }
+    return -1;
   }
 
   int searchBackwards(RegexString string, int start) {

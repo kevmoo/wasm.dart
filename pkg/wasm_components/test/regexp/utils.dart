@@ -23,7 +23,23 @@ final class DartRegexString(final String string) extends RegexString {
 Node parse(
   String source, {
   bool multiline = false,
-  bool caseSensitive = false,
+  bool caseSensitive = true,
+  bool unicode = false,
+  bool dotAll = false,
+}) {
+  return compile(
+    source,
+    multiline: multiline,
+    caseSensitive: caseSensitive,
+    unicode: unicode,
+    dotAll: dotAll,
+  ).root;
+}
+
+Regex compile(
+  String source, {
+  bool multiline = false,
+  bool caseSensitive = true,
   bool unicode = false,
   bool dotAll = false,
 }) {
@@ -59,7 +75,14 @@ extension DumpIR on Node {
           term.writeTo(buffer);
         }
         buffer.write(')');
-      case Quantifier(:final node, :final min, :final max, :final greedy):
+      case Quantifier(
+        :final node,
+        :final min,
+        :final max,
+        :final greedy,
+        :final firstCapture,
+        :final captureCount,
+      ):
         buffer.write('q(');
         node.writeTo(buffer);
         buffer.write(', ');
@@ -75,7 +98,18 @@ extension DumpIR on Node {
         if (!greedy) {
           buffer.write('?');
         }
+        if (captureCount != 0) {
+          buffer.write(
+            ', groups: $firstCapture..${firstCapture + captureCount - 1}',
+          );
+        }
         buffer.write(')');
+      case CaptureGroup(:final inner, :final index):
+        buffer.write('g$index(');
+        inner.writeTo(buffer);
+        buffer.write(')');
+      case BackReference(:final index, :final ignoreCase):
+        buffer.write('ref($index${ignoreCase ? ', i' : ''})');
       case LiteralNode(:final needle):
         buffer.write('lit($needle)');
       case MatchAny(:final dotAll):
