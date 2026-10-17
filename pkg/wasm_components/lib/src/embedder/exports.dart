@@ -8,6 +8,7 @@ import 'dart:_wasm';
 import 'dart:convert';
 
 import '../runtime/async/task.dart';
+import 'charcodes.dart';
 import 'clock.dart';
 import 'constants.dart';
 import 'dark_arts.dart';
@@ -319,6 +320,120 @@ WasmExternRef regexpCreateOrFailWithString(
 WasmI32 regexpIsRegexp(WasmExternRef? ref) {
   // We throw a Dart exception directly in regexpCreateOrFailWithString instead.
   return const WasmI32(1);
+}
+
+@pragma('wasm:export')
+WasmExternRef regexpEscape(WasmExternRef? string) {
+  final input = WasmStringImplementation.fromExtern(string);
+  final length = input.length;
+
+  List<int>? escaped;
+  for (var i = 0; i < length; i++) {
+    final char = input.codeUnitAtUnchecked(i);
+    final needsEscape = switch (char) {
+      $$ ||
+      $lparen ||
+      $rparen ||
+      $asterisk ||
+      $plus ||
+      $dot ||
+      $question ||
+      $lbracket ||
+      $backslash ||
+      $rbracket ||
+      $caret ||
+      $lbrace ||
+      $bar ||
+      $rbrace => true,
+      _ => false,
+    };
+
+    if (needsEscape) {
+      escaped ??= [for (var j = 0; j < i; j++) input.codeUnitAtUnchecked(j)];
+      escaped.add($backslash);
+    }
+    escaped?.add(char);
+  }
+
+  if (escaped == null) {
+    // Nothing to escape.
+    return input.externalize();
+  }
+
+  return WasmStringImplementation.fromDartCodeUnits(
+    escaped,
+    input.isOneByteString,
+  ).externalize();
+}
+
+@pragma('wasm:export')
+WasmExternRef? regexpMatch(
+  WasmExternRef? regexp,
+  WasmExternRef? string,
+  WasmI32 start,
+  WasmI32 asPrefix,
+) {
+  final regex = regexp!.internalize().toObject() as Regex;
+  final match = regex.search(
+    WasmStringImplementation.fromExtern(string),
+    start.toIntUnsigned(),
+    asPrefix: asPrefix.toBool(),
+  );
+
+  return match?.externalize();
+}
+
+RegexMatch _regexMatchFromExtern(WasmExternRef? match) {
+  return match!.internalize().toObject() as RegexMatch;
+}
+
+@pragma('wasm:export')
+WasmI32 regexpMatchGetStart(WasmExternRef? match) {
+  return _regexMatchFromExtern(match).start.toWasmI32();
+}
+
+@pragma('wasm:export')
+WasmI32 regexpMatchGetEnd(WasmExternRef? match) {
+  return _regexMatchFromExtern(match).end.toWasmI32();
+}
+
+@pragma('wasm:export')
+WasmI32 regexpMatchGetGroupCount(WasmExternRef? match) {
+  return _regexMatchFromExtern(match).groupCount.toWasmI32();
+}
+
+@pragma('wasm:export')
+WasmExternRef? regexpMatchGetGroup(WasmExternRef? match, WasmI32 index) {
+  final regexMatch = _regexMatchFromExtern(match);
+  final group = index.toIntUnsigned();
+  final start = regexMatch.groupStart(group);
+  if (start == -1) {
+    return null;
+  }
+
+  return (regexMatch.input as WasmStringImplementation)
+      .substring(start.toWasmI32(), regexMatch.groupEnd(group).toWasmI32())
+      .externalize();
+}
+
+@pragma('wasm:export')
+WasmI32 regexpMatchGetNamedGroups(WasmExternRef? match) {
+  // TODO: Support named groups. The parser rejects them for now, so no match
+  // has any.
+  return const WasmI32(0);
+}
+
+@pragma('wasm:export')
+WasmExternRef regexpMatchGetGroupName(WasmExternRef? match, WasmI32 index) {
+  throw UnsupportedError('Named groups are not supported');
+}
+
+@pragma('wasm:export')
+WasmExternRef? regexpMatchGetGroupByName(
+  WasmExternRef? match,
+  WasmI32 nameIndex,
+) {
+  throw UnsupportedError('Named groups are not supported');
 }
 
 @pragma('wasm:export')

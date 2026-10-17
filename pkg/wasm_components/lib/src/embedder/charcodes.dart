@@ -34,6 +34,9 @@ const int $minus = 0x2d;
 /// Character `.`.
 const int $dot = 0x2e;
 
+/// Character `/`.
+const int $slash = 0x2f;
+
 /// Character `0`.
 const int $0 = 0x30;
 

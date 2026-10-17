@@ -307,6 +307,28 @@ final class RegexParser(
       _position = start;
     }
 
+    switch (first) {
+      // https://tc39.es/ecma262/#prod-IdentityEscape for syntax characters and
+      // `/`, which are valid with and without the unicode flag.
+      case $caret ||
+          $$ ||
+          $backslash ||
+          $dot ||
+          $asterisk ||
+          $plus ||
+          $question ||
+          $lparen ||
+          $rparen ||
+          $lbracket ||
+          $rbracket ||
+          $lbrace ||
+          $rbrace ||
+          $bar ||
+          $slash:
+        _advance();
+        return MatchSingleCharacter(first);
+    }
+
     _error('todo');
   }
 

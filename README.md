@@ -94,14 +94,14 @@ __Legend__:
 | stringBufferClear                        | ✅          | 🎯        |                               |
 | stringBufferLength                       | ✅          | 🎯        |                               |
 | stringBufferToString                     | ✅          | 🎯        |                               |
-| regexpCreateOrFailWithString             |             | 🎯        | See [what Kotlin does](https://github.com/JetBrains/kotlin/tree/master/libraries/stdlib/native-wasm/src/kotlin/text/regex)          |
-| regexpIsRegexp                           |             | 🎯        |                               |
-| regexpEscape                             |             | 🎯        |                               |
-| regexpMatch                              |             | 🎯        |                               |
-| regexpMatchGetStart                      |             | 🎯        |                               |
-| regexpMatchGetEnd                        |             | 🎯        |                               |
-| regexpMatchGetGroupCount                 |             | 🎯        |                               |
-| regexpMatchGetGroup                      |             | 🎯        |                               |
+| regexpCreateOrFailWithString             | ✅          | 🎯        |                               |
+| regexpIsRegexp                           | ✅          | 🎯        |                               |
+| regexpEscape                             | ✅          | 🎯        |                               |
+| regexpMatch                              | ✅          | 🎯        |                               |
+| regexpMatchGetStart                      | ✅          | 🎯        |                               |
+| regexpMatchGetEnd                        | ✅          | 🎯        |                               |
+| regexpMatchGetGroupCount                 | ✅          | 🎯        |                               |
+| regexpMatchGetGroup                      | ✅          | 🎯        |                               |
 | regexpMatchGetNamedGroups                |             | 🎯        |                               |
 | regexpMatchGetGroupName                  |             | 🎯        |                               |
 | regexpMatchGetGroupByName                |             | 🎯        |                               |

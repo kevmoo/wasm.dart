@@ -98,6 +98,15 @@ final class const Regex(final Node root, {final int groupCount = 0}) {
     return null;
   }
 
+  /// Finds a match of this regex as used by `RegExp.firstMatch` (when
+  /// [asPrefix] is false) or `RegExp.matchAsPrefix` (when it's true).
+  RegexMatch? search(RegexString input, int start, {required bool asPrefix}) {
+    final captures = asPrefix
+        ? matchAt(input, start)
+        : firstMatch(input, start);
+    return captures == null ? null : RegexMatch(input, this, captures);
+  }
+
   bool _matchAt(MatchState state, int start) {
     return root.match(state, start, (end) {
       state.captures
@@ -106,6 +115,27 @@ final class const Regex(final Node root, {final int groupCount = 0}) {
       return true;
     });
   }
+}
+
+/// A successful match of a [Regex] on an [input].
+final class const RegexMatch(
+  final RegexString input,
+  final Regex regex,
+
+  /// Capture offsets, as described in [MatchState.captures].
+  final Int32List captures,
+) {
+  int get start => captures[0];
+  int get end => captures[1];
+  int get groupCount => regex.groupCount;
+
+  /// The start offset of the group at [index], or `-1` if the group did not
+  /// participate in the match.
+  int groupStart(int index) => captures[2 * index];
+
+  /// The end offset of the group at [index], or `-1` if the group did not
+  /// participate in the match.
+  int groupEnd(int index) => captures[2 * index + 1];
 }
 
 abstract base class const Node() {

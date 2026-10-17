@@ -136,6 +136,13 @@ void main() {
       check('(a)*?b', ['aab']);
     });
 
+    test('identity escapes', () {
+      check(r'a\.b', ['a.b', 'axb']);
+      check(r'\(\)\[\]\{\}', ['x()[]{}']);
+      check(r'\^\$\\\/\|\*\+\?', [r'^$\/|*+?', '^']);
+      check(RegExp.escape(r'1+1=2 (really?)'), ['1+1=2 (really?)', '11=2']);
+    });
+
     test('backreferences', () {
       check(r'(a+)b\1', ['aabaa', 'aaba', 'abaa']);
       check(r'(a)|\1b', ['b', 'a']);
