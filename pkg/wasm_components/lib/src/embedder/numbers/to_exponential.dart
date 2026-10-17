@@ -5,6 +5,7 @@
 // ignore: import_internal_library
 import 'dart:_wasm';
 
+import '../charcodes.dart';
 import '../constants.dart' as constants;
 import '../string.dart';
 import '../utils.dart';
@@ -123,16 +124,16 @@ Latin1String _formatExponential(
     start + count + dotLength + 2 + exponentLength,
   );
 
-  if (sign) result.write(0, charMinus);
+  if (sign) result.write(0, $minus);
   result.write(start, digits.readUnsigned(0));
   var index = start + 1;
   if (count > 1) {
-    result.write(index++, charDot);
+    result.write(index++, $dot);
     result.copyTyped(index, digits, 1, count - 1);
     index += count - 1;
   }
-  result.write(index++, charE);
-  result.write(index++, exponent < 0 ? charMinus : charPlus);
+  result.write(index++, $e);
+  result.write(index++, exponent < 0 ? $minus : $plus);
   writeDigits(result, index + exponentLength, absExponent, exponentLength);
   return Latin1String.unsafeWrap(result);
 }
@@ -156,7 +157,7 @@ Latin1String _formatPrecision(
     result = WasmArray(start + precision + (hasDot ? 1 : 0));
     result.copyTyped(start, digits, 0, integerDigits);
     if (hasDot) {
-      result.write(start + integerDigits, charDot);
+      result.write(start + integerDigits, $dot);
       result.copyTyped(
         start + integerDigits + 1,
         digits,
@@ -168,22 +169,22 @@ Latin1String _formatPrecision(
     // 0.000ddd
     final leadingZeroes = -exponent - 1;
     result = WasmArray(start + 2 + leadingZeroes + precision);
-    result.write(start, char0);
-    result.write(start + 1, charDot);
+    result.write(start, $0);
+    result.write(start + 1, $dot);
     for (var i = 0; i < leadingZeroes; i++) {
-      result.write(start + 2 + i, char0);
+      result.write(start + 2 + i, $0);
     }
     result.copyTyped(start + 2 + leadingZeroes, digits, 0, precision);
   }
 
-  if (sign) result.write(0, charMinus);
+  if (sign) result.write(0, $minus);
   return Latin1String.unsafeWrap(result);
 }
 
 WasmArray<WasmI8> _zeroes(int count) {
   final digits = WasmArray<WasmI8>(count);
   for (var i = 0; i < count; i++) {
-    digits.write(i, char0);
+    digits.write(i, $0);
   }
   return digits;
 }
@@ -332,14 +333,14 @@ int _d2exp(int m2, int e2, int count, WasmArray<WasmI8> out) {
   // ties away from zero.
   if (lastDigit >= 5) {
     var i = count - 1;
-    while (i >= 0 && out.readUnsigned(i) == char0 + 9) {
-      out.write(i, char0);
+    while (i >= 0 && out.readUnsigned(i) == $0 + 9) {
+      out.write(i, $0);
       i--;
     }
 
     if (i < 0) {
       // All digits were 9, so we're at the next power of 10 now.
-      out.write(0, char0 + 1);
+      out.write(0, $0 + 1);
       exponent++;
     } else {
       out.write(i, out.readUnsigned(i) + 1);

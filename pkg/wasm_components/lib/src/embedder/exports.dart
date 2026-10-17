@@ -15,6 +15,9 @@ import 'number_format.dart';
 import 'numbers/ryu.dart';
 import 'numbers/to_exponential.dart';
 import 'numbers/to_fixed.dart';
+import 'regex/literal.dart';
+import 'regex/parser.dart';
+import 'regex/regex.dart';
 import 'stack_trace.dart';
 import 'string.dart';
 import 'string_buffer.dart';
@@ -182,11 +185,11 @@ WasmExternRef? stringSubstring(
 
 @pragma('wasm:export')
 WasmI32 stringIndexOfString(WasmExternRef? a, WasmExternRef? b, WasmI32 start) {
+  final haystack = WasmStringImplementation.fromExtern(a);
+  final needle = WasmStringImplementation.fromExtern(b);
+
   return WasmI32.fromInt(
-    WasmStringImplementation.fromExtern(a).indexOfString(
-      WasmStringImplementation.fromExtern(b),
-      start.toIntSigned(),
-    ),
+    LiteralNode(needle).firstIndexOf(haystack, start.toIntUnsigned()),
   );
 }
 
@@ -196,11 +199,11 @@ WasmI32 stringLastIndexOfString(
   WasmExternRef? b,
   WasmI32 start,
 ) {
+  final haystack = WasmStringImplementation.fromExtern(a);
+  final needle = WasmStringImplementation.fromExtern(b);
+
   return WasmI32.fromInt(
-    WasmStringImplementation.fromExtern(a).lastIndexOfString(
-      WasmStringImplementation.fromExtern(b),
-      start.toIntSigned(),
-    ),
+    LiteralNode(needle).searchBackwards(haystack, start.toIntUnsigned()),
   );
 }
 
@@ -287,6 +290,35 @@ WasmVoid stringToCodeUnits(
   final impl = WasmStringImplementation.fromExtern(string);
   impl.writeIntoCharArray(outArray, startIndex.toIntUnsigned(), 0, impl.length);
   return WasmVoid();
+}
+
+@pragma('wasm:export')
+WasmExternRef regexpCreateOrFailWithString(
+  WasmExternRef? string,
+  WasmI32 multiLine,
+  WasmI32 caseSensitive,
+  WasmI32 unicode,
+  WasmI32 dotAll,
+) {
+  final options = RegexParseOptions(
+    multiline: multiLine.toBool(),
+    caseSensitive: caseSensitive.toBool(),
+    unicode: unicode.toBool(),
+    dotAll: dotAll.toBool(),
+  );
+
+  final parser = RegexParser(
+    WasmStringImplementation.fromExtern(string),
+    options,
+    WasmStringImplementation.fromDartCodeUnits,
+  );
+  return WasmAnyRef.fromObject(parser.parse()).externalize();
+}
+
+@pragma('wasm:export')
+WasmI32 regexpIsRegexp(WasmExternRef? ref) {
+  // We throw a Dart exception directly in regexpCreateOrFailWithString instead.
+  return const WasmI32(1);
 }
 
 @pragma('wasm:export')

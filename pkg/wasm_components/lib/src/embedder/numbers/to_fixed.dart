@@ -6,6 +6,7 @@
 // ignore: import_internal_library
 import 'dart:_wasm';
 
+import '../charcodes.dart';
 import '../constants.dart' as constants;
 import '../string.dart';
 import '../utils.dart';
@@ -47,16 +48,16 @@ Latin1String formatDoubleToFixed(double value, int fractionDigits) {
   final out = _Output(WasmArray(24 + fractionDigits));
 
   if (ieeeExponent == 0 && ieeeMantissa == 0) {
-    out.append(char0);
+    out.append($0);
     if (fractionDigits != 0) {
-      out.append(charDot);
+      out.append($dot);
       out.appendZeroes(fractionDigits);
     }
     return out.finish();
   }
 
   if (sign) {
-    out.append(charMinus);
+    out.append($minus);
   }
 
   final int e2, m2;
@@ -96,10 +97,10 @@ Latin1String formatDoubleToFixed(double value, int fractionDigits) {
   }
 
   if (!nonzero) {
-    out.append(char0);
+    out.append($0);
   }
   if (fractionDigits != 0) {
-    out.append(charDot);
+    out.append($dot);
   }
   if (e2 >= 0) {
     out.appendZeroes(fractionDigits);
@@ -168,7 +169,7 @@ final class _Output {
 
   void appendZeroes(int count) {
     for (var i = 0; i < count; i++) {
-      buffer.write(index++, char0);
+      buffer.write(index++, $0);
     }
   }
 
@@ -185,26 +186,26 @@ final class _Output {
     // '.' can't be located at index 0
     var dotIndex = 0;
     while (true) {
-      if (roundIndex == 0 || buffer.readUnsigned(roundIndex - 1) == charMinus) {
+      if (roundIndex == 0 || buffer.readUnsigned(roundIndex - 1) == $minus) {
         // All digits were 9 (and are zero now), so we need an additional
         // leading 1. We write it over the first 0 and then shift the dot to
         // the right by appending another zero.
-        buffer.write(roundIndex, char0 + 1);
+        buffer.write(roundIndex, $0 + 1);
         if (dotIndex > 0) {
-          buffer.write(dotIndex, char0);
-          buffer.write(dotIndex + 1, charDot);
+          buffer.write(dotIndex, $0);
+          buffer.write(dotIndex + 1, $dot);
         }
-        append(char0);
+        append($0);
         break;
       }
 
       roundIndex--;
       final c = buffer.readUnsigned(roundIndex);
-      if (c == charDot) {
+      if (c == $dot) {
         dotIndex = roundIndex;
         continue;
-      } else if (c == char0 + 9) {
-        buffer.write(roundIndex, char0);
+      } else if (c == $0 + 9) {
+        buffer.write(roundIndex, $0);
         continue;
       }
 

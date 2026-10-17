@@ -11,6 +11,7 @@
 import 'dart:_wasm';
 
 import '../constants.dart' as constants;
+import '../charcodes.dart';
 import '../string.dart';
 
 const _doubleMantissaBits = 52;
@@ -18,12 +19,6 @@ const _doubleExponentBits = 11;
 const _doubleBias = 1023;
 const _doublePow5InvBitCount = 125;
 const _doublePow5BitCount = 125;
-
-const char0 = 0x30; // '0'
-const charDot = 0x2e; // '.'
-const charE = 0x65; // 'e'
-const charPlus = 0x2b; // '+'
-const charMinus = 0x2d; // '-'
 
 Latin1String formatDouble(double value) {
   if (value.isNaN) {
@@ -55,10 +50,10 @@ Latin1String formatDouble(double value) {
     result = WasmArray(start + kk + 2);
     writeDigits(result, start + length, mantissa, length);
     for (var i = start + length; i < start + kk; i++) {
-      result.write(i, char0);
+      result.write(i, $0);
     }
-    result.write(start + kk, charDot);
-    result.write(start + kk + 1, char0);
+    result.write(start + kk, $dot);
+    result.write(start + kk + 1, $0);
   } else if (0 < kk && kk <= 21) {
     // 1234e-2 -> 12.34
     result = WasmArray(start + length + 1);
@@ -69,16 +64,16 @@ Latin1String formatDouble(double value) {
       mantissa,
       fractionDigits,
     );
-    result.write(start + kk, charDot);
+    result.write(start + kk, $dot);
     writeDigits(result, start + kk, integral, kk);
   } else if (-6 < kk && kk <= 0) {
     // 1234e-6 -> 0.001234
     final offset = 2 - kk;
     result = WasmArray(start + offset + length);
-    result.write(start, char0);
-    result.write(start + 1, charDot);
+    result.write(start, $0);
+    result.write(start + 1, $dot);
     for (var i = start + 2; i < start + offset; i++) {
-      result.write(i, char0);
+      result.write(i, $0);
     }
     writeDigits(result, start + offset + length, mantissa, length);
   } else {
@@ -93,8 +88,8 @@ Latin1String formatDouble(double value) {
     if (length == 1) {
       // 1e+30
       result = WasmArray(start + 3 + exponentLength);
-      result.write(start, char0 + mantissa);
-      result.write(start + 1, charE);
+      result.write(start, $0 + mantissa);
+      result.write(start + 1, $e);
     } else {
       // 1234e30 -> 1.234e+33
       result = WasmArray(start + length + 3 + exponentLength);
@@ -104,18 +99,18 @@ Latin1String formatDouble(double value) {
         mantissa,
         length - 1,
       );
-      result.write(start, char0 + first);
-      result.write(start + 1, charDot);
-      result.write(start + length + 1, charE);
+      result.write(start, $0 + first);
+      result.write(start + 1, $dot);
+      result.write(start + length + 1, $e);
     }
 
     final exponentStart = result.length - exponentLength - 1;
-    result.write(exponentStart, scientificExponent < 0 ? charMinus : charPlus);
+    result.write(exponentStart, scientificExponent < 0 ? $minus : $plus);
     writeDigits(result, result.length, absExponent, exponentLength);
   }
 
   if (sign) {
-    result.write(0, charMinus);
+    result.write(0, $minus);
   }
   return Latin1String.unsafeWrap(result);
 }
@@ -127,7 +122,7 @@ Latin1String formatDouble(double value) {
 int writeDigits(WasmArray<WasmI8> target, int end, int value, int count) {
   for (var i = 1; i <= count; i++) {
     final next = value ~/ 10;
-    target.write(end - i, char0 + (value - 10 * next));
+    target.write(end - i, $0 + (value - 10 * next));
     value = next;
   }
   return value;
