@@ -10,3 +10,4 @@ dependencies:
   wasm_components:
   wasm_tools:
   wasi:
+  shelf: ^1.4.3

@@ -1,24 +1,31 @@
 import 'dart:async';
 import 'dart:convert';
 
-import 'package:wasi/src/components/wasi_http_service.dart';
-import 'package:wasi/src/components/wasi_http.dart';
-import 'package:wasm_components/wasm_components.dart';
+import 'package:shelf/shelf.dart' as shelf;
+import 'package:wasi/http/service.dart';
+
+var _requestId = 0;
 
 void main() {
-  serviceComponent((imports) => _RequestHandler(imports));
+  serveWasiShelf(
+    (_) => const shelf.Pipeline()
+        .addMiddleware(_wasiServerHeaderMiddleware)
+        .addHandler(_router),
+  );
 }
 
-final class _RequestHandler(final ServiceImports _imports) implements Handler {
-  var _requestId = 0;
+shelf.Middleware get _wasiServerHeaderMiddleware => (innerHandler) {
+  return (request) async {
+    final response = await innerHandler(request);
+    return response.change(
+      headers: {'x-powered-by': 'dart2wasm + pkg:wasi + package:shelf'},
+    );
+  };
+};
 
-  @override
-  Future<Result<Owned<TypesResponse>, TypesErrorCode>> handle({
-    required Owned<TypesRequest> request,
-  }) async {
-    final headers = _imports.httpTypes.constructorFields();
-
-    final responseText =
+FutureOr<shelf.Response> _router(shelf.Request request) =>
+    switch ((request.method, request.url.pathSegments)) {
+      ('GET', []) => shelf.Response.ok(
         '''
 <!doctype html>
 <html>
@@ -26,26 +33,44 @@ final class _RequestHandler(final ServiceImports _imports) implements Handler {
   <title>dart2wasm http server</title>
 </head>
 <body>
-<h1>This website is running Dart!</h1>
+<h1>This website is running Dart + <code>package:shelf</code>!</h1>
 
 <p>
 Okay, that alone wouldn't be too impressive. But it's also running in <em>wasmtime</em>!
-</p<>
+</p>
 
 <p>
 This is request number ${_requestId++} served by this instance.
 </p>
 </body>
 </html>
-''';
+''',
+        headers: {'content-type': 'text/html; charset=utf-8'},
+      ),
+      ('GET', ['hello', final name]) => shelf.Response.ok(
+        const JsonEncoder.withIndent('  ').convert({
+          'greeting': 'Hello, ${Uri.decodeComponent(name)}!',
+          'runtime': 'wasmtime (wasi:http/service@0.3.0)',
+          'framework': 'package:shelf',
+          'path': request.requestedUri.path,
+          'query': request.requestedUri.queryParameters,
+        }),
+        headers: {'content-type': 'application/json; charset=utf-8'},
+      ),
+      ('POST', ['echo']) => _handleEcho(request),
+      _ => shelf.Response.notFound('Not found\n'),
+    };
 
-    final (response, _) = _imports.httpTypes.staticResponseNew(
-      headers: headers,
-      contents: .some(.value(utf8.encode(responseText))),
-      trailers: Future.syncValue(.ok(.none)),
-    );
-
-    request.drop();
-    return .ok(response);
-  }
+Future<shelf.Response> _handleEcho(shelf.Request request) async {
+  final body = await request.readAsString(utf8);
+  return shelf.Response.ok(
+    const JsonEncoder.withIndent('  ').convert({
+      'echoedMethod': request.method,
+      'echoedPath': request.requestedUri.path,
+      'echoedQuery': request.requestedUri.queryParameters,
+      'bodyLength': body.length,
+      'body': body,
+    }),
+    headers: {'content-type': 'application/json; charset=utf-8'},
+  );
 }
