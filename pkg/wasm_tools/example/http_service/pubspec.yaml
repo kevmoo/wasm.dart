@@ -11,3 +11,4 @@ dependencies:
   wasm_tools:
   wasi:
   shelf: ^1.4.3
+  http: ^1.6.0

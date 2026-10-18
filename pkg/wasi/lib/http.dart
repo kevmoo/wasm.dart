@@ -7,3 +7,4 @@
 library;
 
 export 'src/components/wasi_http.dart' hide Types;
+export 'src/utils/http_client.dart' show WasiHttpClient;

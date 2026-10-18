@@ -13,3 +13,4 @@ dependencies:
   shelf: ^1.4.0
   wasm_components: ^0.1.0-preview.0
   wasm_tools: ^0.1.0-preview.0
+  http: ^1.6.0
