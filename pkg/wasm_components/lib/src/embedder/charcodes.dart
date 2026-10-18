@@ -61,11 +61,23 @@ const int $question = 0x3f;
 /// Character `A`.
 const int $A = 0x41;
 
+/// Character `B`.
+const int $B = 0x42;
+
+/// Character `D`.
+const int $D = 0x44;
+
 /// Character `I`.
 const int $I = 0x49;
 
 /// Character `N`.
 const int $N = 0x4e;
+
+/// Character `S`.
+const int $S = 0x53;
+
+/// Character `W`.
+const int $W = 0x57;
 
 /// Character `Z`.
 const int $Z = 0x5a;
@@ -85,8 +97,44 @@ const int $caret = 0x5e;
 /// Character `a`.
 const int $a = 0x61;
 
+/// Character `b`.
+const int $b = 0x62;
+
+/// Character `c`.
+const int $c = 0x63;
+
+/// Character `d`.
+const int $d = 0x64;
+
 /// Character `e`.
 const int $e = 0x65;
+
+/// Character `f`.
+const int $f = 0x66;
+
+/// Character `n`.
+const int $n = 0x6e;
+
+/// Character `r`.
+const int $r = 0x72;
+
+/// Character `s`.
+const int $s = 0x73;
+
+/// Character `t`.
+const int $t = 0x74;
+
+/// Character `u`.
+const int $u = 0x75;
+
+/// Character `v`.
+const int $v = 0x76;
+
+/// Character `w`.
+const int $w = 0x77;
+
+/// Character `x`.
+const int $x = 0x78;
 
 /// Character `z`.
 const int $z = 0x7a;

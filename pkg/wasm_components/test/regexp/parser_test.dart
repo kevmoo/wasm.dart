@@ -74,4 +74,20 @@ void main() {
       );
     });
   });
+
+  test('word boundary assertion', () {
+    expect(parse(r'\b').nodeToString(), r'\b');
+    expect(parse(r'\B').nodeToString(), r'\B');
+  });
+
+  test('character classes', () {
+    expect(parse('[a-z0-9]').nodeToString(), '[0x61-0x7a 0x30-0x39 ]');
+    expect(parse(r'[^\d\s]').nodeToString(), r'[^\d \s ]');
+    expect(() => parse('[z-a]'), throwsFormatException);
+    expect(() => parse('[abc'), throwsFormatException);
+  });
+
+  test('lookahead', () {
+    expect(parse(r'a(?!b)').nodeToString(), 'cat(c(0x61), (?!c(0x62)))');
+  });
 }

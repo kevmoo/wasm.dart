@@ -12,6 +12,7 @@ void main() {
     _escape,
     _invalidPattern,
     _replaceAll,
+    _characterClassesAndEscapes,
   ]);
 }
 
@@ -138,4 +139,18 @@ void _replaceAll(BaseResultCollector collector) {
     )
     ..recordString(e: 'a 👋 b'.replaceAll(RegExp(' '), '_'))
     ..recordString(e: 'ab\nab'.replaceAll(RegExp('^a', multiLine: true), 'X'));
+}
+
+void _characterClassesAndEscapes(BaseResultCollector collector) {
+  _recordMatch(collector, RegExp(r'(\w+)=(\d+)').firstMatch('foo=42'));
+  _recordMatch(
+    collector,
+    RegExp(r'([^<]*)(?:<([^>|]+)(?:\|([^>]*))?>)?').firstMatch('/hello/<name>'),
+  );
+  collector.recordBool(
+    e: RegExp(r'^[^()<>@,;:"\\/[\]?={} \t\x00-\x1F\x7F]+$')
+        .hasMatch('application-json'),
+  );
+  collector.recordBool(e: RegExp(r'\bword\b').hasMatch('a word here'));
+  collector.recordBool(e: RegExp(r'\n|\r\n|\r(?!\n)').hasMatch('a\rb'));
 }
