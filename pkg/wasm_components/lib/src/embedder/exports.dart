@@ -541,6 +541,49 @@ WasmVoid wasiPrint(WasmExternRef? string) {
   return WasmVoid();
 }
 
+@pragma('wasm:export')
+WasmExternRef? stringReplaceAllString(
+  WasmExternRef? stringRef,
+  WasmExternRef? needleRef,
+  WasmExternRef? replacementRef,
+) {
+  final string = WasmStringImplementation.fromExtern(stringRef);
+  final needle = WasmStringImplementation.fromExtern(needleRef);
+  final replacement = WasmStringImplementation.fromExtern(replacementRef);
+
+  final len = string.length;
+  final nLen = needle.length;
+  final buffer = WasmStringBuffer();
+
+  if (nLen == 0) {
+    buffer.writeString(replacement);
+    for (var i = 0; i < len; i++) {
+      buffer
+        ..writeCharCode(string.codeUnitAtUnchecked(i))
+        ..writeString(replacement);
+    }
+  } else {
+    final literal = LiteralNode(needle);
+    var start = 0;
+    while (true) {
+      final idx = literal.firstIndexOf(string, start);
+      if (idx == -1) {
+        if (start == 0) return stringRef;
+        buffer.writeString(
+          string.substring(start.toWasmI32(), len.toWasmI32()),
+        );
+        break;
+      }
+      buffer
+        ..writeString(string.substring(start.toWasmI32(), idx.toWasmI32()))
+        ..writeString(replacement);
+      start = idx + nLen;
+    }
+  }
+
+  return buffer.renderToString().externalize();
+}
+
 @pragma('wasm:export', 'randomInt')
 WasmI64 randomInt() {
   // Note: This function is recognized by the component compiler, which will add

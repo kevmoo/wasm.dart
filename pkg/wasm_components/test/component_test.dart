@@ -4,6 +4,10 @@ import 'package:test/test.dart';
 import 'package:path/path.dart' as p;
 import 'package:test_descriptor/test_descriptor.dart' as d;
 
+/// Compares test/cases runs between the Dart VM and when compiled to a
+/// WebAssembly component.
+///
+/// Use `dart run tool/generate_test_goldens.dart` to update goldens.
 void main() async {
   late String testRunnerExecutable;
 
