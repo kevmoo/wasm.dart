@@ -61,6 +61,12 @@ const int $question = 0x3f;
 /// Character `A`.
 const int $A = 0x41;
 
+/// Character `I`.
+const int $I = 0x49;
+
+/// Character `N`.
+const int $N = 0x4e;
+
 /// Character `Z`.
 const int $Z = 0x5a;
 

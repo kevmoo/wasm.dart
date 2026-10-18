@@ -13,6 +13,7 @@ import 'clock.dart';
 import 'constants.dart';
 import 'dark_arts.dart';
 import 'number_format.dart';
+import 'numbers/parse.dart';
 import 'numbers/ryu.dart';
 import 'numbers/to_exponential.dart';
 import 'numbers/to_fixed.dart';
@@ -146,6 +147,29 @@ WasmExternRef f64ToPrecision(WasmF64 value, WasmI32 precision) {
   }
 
   return formatDoubleToPrecision(value.toDouble(), dartPrecision).externalize();
+}
+
+@pragma('wasm:export')
+WasmExternRef? doubleTryParse(WasmExternRef? string) {
+  final parsed = parseDouble(WasmStringImplementation.fromExtern(string));
+  if (parsed == invalidDouble) {
+    return .nullRef;
+  }
+
+  return parsed.toWasmI64().asWasmF64.toDouble().externalize();
+}
+
+@pragma('wasm:export')
+WasmF64 tryParseResultGetDouble(WasmExternRef? parseResult) {
+  final value = parseResult!.internalize().toObject();
+  return (value as double).toWasmF64();
+}
+
+@pragma('wasm:export')
+WasmF64 doubleParseInfallible(WasmExternRef? string) {
+  return parseDouble(WasmStringImplementation.fromExtern(string))
+      .toWasmI64()
+      .asWasmF64;
 }
 
 @pragma('wasm:export')
