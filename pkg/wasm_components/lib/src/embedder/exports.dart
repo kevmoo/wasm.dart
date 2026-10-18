@@ -584,6 +584,47 @@ WasmExternRef? stringReplaceAllString(
   return buffer.renderToString().externalize();
 }
 
+@pragma('wasm:export')
+WasmExternRef? stringReplaceAllRegExp(
+  WasmExternRef? stringRef,
+  WasmExternRef? regexRef,
+  WasmExternRef? replacementRef,
+) {
+  final string = WasmStringImplementation.fromExtern(stringRef);
+  final regex = regexRef!.internalize().toObject() as Regex;
+  final replacement = WasmStringImplementation.fromExtern(replacementRef);
+
+  final len = string.length;
+  final buffer = WasmStringBuffer();
+
+  // End of the previous match, i.e. the start of the pending non-matching part.
+  var lastEnd = 0;
+  var searchStart = 0;
+  var hadMatch = false;
+
+  while (searchStart <= len) {
+    final match = regex.search(string, searchStart, asPrefix: false);
+    if (match == null) break;
+
+    hadMatch = true;
+    buffer
+      ..writeString(
+        string.substring(lastEnd.toWasmI32(), match.start.toWasmI32()),
+      )
+      ..writeString(replacement);
+    lastEnd = match.end;
+
+    // After an empty match, advance by one more to avoid matching the same
+    // position again (like `RegExp.allMatches`). The parser rejects the unicode
+    // flag, so we don't have to skip over surrogate pairs here.
+    searchStart = match.start == match.end ? match.end + 1 : match.end;
+  }
+
+  if (!hadMatch) return stringRef;
+  buffer.writeString(string.substring(lastEnd.toWasmI32(), len.toWasmI32()));
+  return buffer.renderToString().externalize();
+}
+
 @pragma('wasm:export', 'randomInt')
 WasmI64 randomInt() {
   // Note: This function is recognized by the component compiler, which will add

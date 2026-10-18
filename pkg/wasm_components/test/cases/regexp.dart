@@ -11,6 +11,7 @@ void main() {
     _flags,
     _escape,
     _invalidPattern,
+    _replaceAll,
   ]);
 }
 
@@ -121,4 +122,20 @@ void _invalidPattern(BaseResultCollector collector) {
       collector.recordBool(e: true);
     }
   }
+}
+
+void _replaceAll(BaseResultCollector collector) {
+  collector
+    ..recordString(e: 'aabaaab'.replaceAll(RegExp('a+'), 'x'))
+    ..recordString(e: 'abc'.replaceAll(RegExp('d'), 'x'))
+    ..recordString(e: 'abc'.replaceAll(RegExp('b*'), '-'))
+    ..recordString(e: ''.replaceAll(RegExp(''), '|'))
+    ..recordString(e: 'ab'.replaceAll(RegExp(''), '|'))
+    // Replacements are inserted literally, without JS-style `\$` patterns.
+    ..recordString(e: 'abc'.replaceAll(RegExp('(b)'), r'[$1$&]'))
+    ..recordString(
+      e: 'Hello World'.replaceAll(RegExp('o', caseSensitive: false), '0'),
+    )
+    ..recordString(e: 'a 👋 b'.replaceAll(RegExp(' '), '_'))
+    ..recordString(e: 'ab\nab'.replaceAll(RegExp('^a', multiLine: true), 'X'));
 }

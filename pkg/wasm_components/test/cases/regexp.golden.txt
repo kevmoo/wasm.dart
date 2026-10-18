@@ -124,3 +124,14 @@
 {"type":"bool","value":true}
 {"type":"bool","value":true}
 {"type":"end","test":8}
+{"type":"start","test":9}
+{"type":"string","value":"xbxb"}
+{"type":"string","value":"abc"}
+{"type":"string","value":"-a--c-"}
+{"type":"string","value":"|"}
+{"type":"string","value":"|a|b|"}
+{"type":"string","value":"a[$1$&]c"}
+{"type":"string","value":"Hell0 W0rld"}
+{"type":"string","value":"a_👋_b"}
+{"type":"string","value":"Xb\nXb"}
+{"type":"end","test":9}

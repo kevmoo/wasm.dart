@@ -56,8 +56,8 @@ __Legend__:
 | stringCodeUnitAt                         | ✅          | 🎯        |                               |
 | stringIndexOfString                      | ✅          | 🎯        |                               |
 | stringLastIndexOfString                  | ✅          | 🎯        |                               |
-| stringReplaceAllString                   |             | 🎯        |                               |
-| stringReplaceAllRegExp                   |             | 🎯        |                               |
+| stringReplaceAllString                   | ✅          | 🎯        |                               |
+| stringReplaceAllRegExp                   | ✅          | 🎯        |                               |
 | stringSubstring                          | ✅          | 🎯        |                               |
 | stringToLowerCase                        | ✅          | 🎯        |                               |
 | stringToUpperCase                        | ✅          | 🎯        |                               |
